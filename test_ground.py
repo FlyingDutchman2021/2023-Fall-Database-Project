@@ -1,30 +1,6 @@
 import tkinter as tk
 
 
-class Frame_Basic:
-    def __init__(self, master):
-        self.frame = tk.Frame(master=master)
-
-
-class Frame_with_3_line(Frame_Basic):
-    def pack(self, *, after=..., **kw) -> None:
-        if kw:
-            print(kw)
-        self.frame.pack()
-
-    def __init__(self, master):
-        super().__init__(master)
-        self.line1 = tk.StringVar()
-        self.line2 = tk.StringVar()
-        self.line3 = tk.StringVar()
-
-        tk.Entry(master=self.frame, textvariable=self.line1).pack()
-        tk.Entry(master=self.frame, textvariable=self.line2).pack()
-        tk.Entry(master=self.frame, textvariable=self.line3).pack()
-
-        self.pack()
-
-
 class MainWindow:
     def setup_main_window(self):
         full_width = self.window.winfo_screenwidth()
@@ -41,7 +17,16 @@ class MainWindow:
         self.window = tk.Tk()
         self.setup_main_window()
 
-        self.frame1 = Frame_with_3_line(self.window)
+
+
+
+
+
+
+
+
+
+
 
         # Main loop
         self.window.mainloop()
