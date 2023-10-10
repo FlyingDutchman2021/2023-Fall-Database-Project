@@ -20,3 +20,13 @@
 #         tk.Entry(master=self.frame, textvariable=self.line3).pack()
 #
 #         self.pack()
+import tkinter as tk
+
+class Base_Frame:
+    def __init__(self, master):
+        pass
+
+class Frame_3Line(Base_Frame):
+    def __init__(self,
+                 master: tk.Misc):
+        pass

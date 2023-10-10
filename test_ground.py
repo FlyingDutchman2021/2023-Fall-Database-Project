@@ -1,4 +1,5 @@
 import tkinter as tk
+import frame
 
 
 class MainWindow:
@@ -19,7 +20,8 @@ class MainWindow:
 
 
 
-
+        self.frame1 = frame.Base_Frame(self.window)
+        self.frame1.tk_frame.pack()
 
 
 
