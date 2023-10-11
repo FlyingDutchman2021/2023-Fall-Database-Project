@@ -24,9 +24,11 @@ import tkinter as tk
 
 class Base_Frame:
     def __init__(self, master):
-        pass
+        self.tk_frame = None
 
 class Frame_3Line(Base_Frame):
     def __init__(self,
                  master: tk.Misc):
-        pass
+        self.line1 = None
+        self.line2 = None
+        self.line3 = None
