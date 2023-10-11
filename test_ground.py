@@ -1,10 +1,9 @@
 import tkinter as tk
-import Entry
+import frame
 
 
 class MainWindow:
     def setup_main_window(self):
-
         full_width = self.window.winfo_screenwidth()
         full_height = self.window.winfo_screenheight()
         width_percentage = 0.82
@@ -19,11 +18,20 @@ class MainWindow:
         self.window = tk.Tk()
         self.setup_main_window()
 
-        self.sample = Entry.Entry(self.window)
-        self.sample.pack()
+
+
+        self.frame1 = frame.Frame_3Line(self.window)
+        self.frame1.tk_frame.pack()
+
+
+
+
+
+
+
 
         # Main loop
         self.window.mainloop()
-    
-    
+
+
 main_window = MainWindow()
