@@ -20,7 +20,7 @@ class MainWindow:
 
 
 
-        self.frame1 = frame.Frame_3Line(self.window)
+        self.frame1 = frame.Log_In_Frame(self.window)
         self.frame1.tk_frame.pack()
 
 
