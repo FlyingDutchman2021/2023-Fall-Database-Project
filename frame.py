@@ -6,7 +6,7 @@ class Base_Frame:
         self.tk_frame = tk.Frame(master)
 
 
-class Frame_3Line(Base_Frame):
+class Log_In_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
         self.line1 = tk.StringVar()
