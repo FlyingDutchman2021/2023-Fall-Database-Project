@@ -1,13 +1,21 @@
-import tkinter as tk
 import tkinter.font
-from tkinter import ttk
-
+import customtkinter as ctk
 import config
-
 
 class Base_Frame:
     def __init__(self, master):
-        self.tk_frame = tk.Frame(master)
+        self.tk_frame = ctk.CTkFrame(master)
+        self.tk_frame.pack(fill="both",expand=True)
+
+    def Log_In(self):
+        for widget in self.tk_frame.winfo_children():
+            widget.destroy()
+        Log_In_Frame(self.tk_frame)
+
+    def Sign_Up(self):
+        for widget in self.tk_frame.winfo_children():
+            widget.destroy()
+        Sign_up_Frame(self.tk_frame)
 
 
 class Log_In_Frame(Base_Frame):
@@ -15,45 +23,40 @@ class Log_In_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.line = []
-        self.entry = []
-
-        for i in range(2):
-            self.line.append(tk.StringVar())
-            self.entry.append(ttk.Entry(master=self.tk_frame,
-                                        textvariable=self.line[i]))
-            self.entry[i].config(font=tkinter.font.Font(family=config.DEFAULT_FAMILY,
-                                                        size=config.DEFAULT_SIZE))
-            self.entry[i].pack(padx=10, pady=10, ipady=2)
+        self.account = ctk.StringVar()
+        self.password = ctk.StringVar()
+        self.frame = ctk.CTkFrame(self.tk_frame)
 
 
-# From Yangjun waiting for manual merge
+        ctk.CTkLabel(master=self.frame,text='Account').grid(row=0, column=0, padx=10,pady=12)
+        ctk.CTkLabel(master=self.frame, text='Password').grid(row=1, column=0, padx=10,pady=12)
+        ctk.CTkEntry(master=self.frame, textvariable = self.account, width=200).grid(row=0, column=1, columnspan=2, padx=10,pady=12)
+        ctk.CTkEntry(master=self.frame, textvariable = self.password, width=200).grid(row=1, column=1, columnspan=2, padx=10,pady=12)
+        ctk.CTkButton(master=self.frame, text="Log in", width=10).grid(row=2, column=1, padx=10,pady=12)
+        ctk.CTkButton(master=self.frame, text="Sign up", width=10, command=lambda: self.Sign_Up()).grid(row=2, column=2, padx=10,pady=12)
+        self.frame.pack()
+
+
+
+        # for i in range(2):
+        #     self.line.append(tk.StringVar())
+        #
+        #     self.entry[i].config(font=tkinter.font.Font(family=config.DEFAULT_FAMILY,
+        #                                                 size=config.DEFAULT_SIZE))
+        #     self.entry[i].pack(padx=10, pady=10, ipady=2)
+
+
 class Sign_up_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
-        self.frame1 = tk.Frame(master)
-        self.frame2 = tk.Frame(master)
-        tk.Label(master=self.frame1, text="Choose your identity").pack()
-        tk.Button(master=self.frame2, text="Patient").pack(side="left")
-        tk.Button(master=self.frame2,text="Doctor").pack(side="left")
-        self.frame1.pack()
-        self.frame2.pack()
+        self.frame = self.frame = ctk.CTkFrame(self.tk_frame)
 
-class Log_In_frame(Base_Frame):
-    def __init__(self, master):
-        super().__init__(master)
-        self.account = tk.StringVar()
-        self.password = tk.StringVar()
-        self.frame1 = tk.Frame(master)
-        self.frame2 = tk.Frame(master)
-        self.frame3 = tk.Frame(master)
 
-        tk.Label(master=self.frame1,text="Account").pack(side="left")
-        tk.Entry(master=self.frame1, textvariable=self.account).pack(side="left")
-        tk.Label(master=self.frame2, text="Password").pack(side="left")
-        tk.Entry(master=self.frame2, textvariable=self.password).pack(side="left")
-        tk.Button(master=self.frame3, text="Sign up").pack(side="left")
-        tk.Button(master=self.frame3, text="Log in").pack(side="left")
-        self.frame1.pack()
-        self.frame2.pack()
-        self.frame3.pack()
+
+
+        ctk.CTkLabel(master=self.frame, text="Choose your identity",width=200).grid(row=0, column=0, columnspan=2, padx=10,pady=12)
+        ctk.CTkButton(master=self.frame, text="Patient", width=10).grid(row=1, column=0, padx=10,pady=12)
+        ctk.CTkButton(master=self.frame, text="Doctor", width=10).grid(row=1, column=1, padx=10,pady=12)
+        ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.Log_In()).grid(row=0, column=2, padx=10, pady=12)
+        self.frame.pack()
+
