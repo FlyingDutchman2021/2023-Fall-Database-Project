@@ -1,6 +1,4 @@
-import tkinter.font
 import customtkinter as ctk
-import config
 
 
 class Base_Frame:
@@ -38,7 +36,7 @@ class Log_In_Frame(Base_Frame):
         self.password = ctk.StringVar()
         self.frame = ctk.CTkFrame(self.tk_frame)
 
-        ctk.CTkLabel(master=self.frame, text='Account').grid(row=0, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Phone Number').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=self.frame, text='Password').grid(row=1, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.account, width=200).grid(row=0, column=1, columnspan=2,
                                                                                    padx=10, pady=12)
@@ -51,18 +49,11 @@ class Log_In_Frame(Base_Frame):
                                                                                                                pady=12)
         self.frame.pack()
 
-        # for i in range(2):
-        #     self.line.append(tk.StringVar())
-        #
-        #     self.entry[i].config(font=tkinter.font.Font(family=config.DEFAULT_FAMILY,
-        #                                                 size=config.DEFAULT_SIZE))
-        #     self.entry[i].pack(padx=10, pady=10, ipady=2)
-
 
 class Sign_up_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
-        self.frame = self.frame = ctk.CTkFrame(self.tk_frame)
+        self.frame = ctk.CTkFrame(self.tk_frame)
 
         ctk.CTkLabel(master=self.frame, text="Choose your identity", width=200).grid(
             row=0, column=0, columnspan=3, padx=10, pady=12)
@@ -82,7 +73,7 @@ class Sign_up_Patient_Frame(Base_Frame):
         self.birthday = ctk.StringVar()
         self.gender = ctk.StringVar()
         self.contact_number = ctk.StringVar()
-        self.frame = self.frame = ctk.CTkFrame(self.tk_frame)
+        self.frame = ctk.CTkFrame(self.tk_frame)
 
         ctk.CTkLabel(master=self.frame, text="Please enter your message", width=200).grid(row=0, column=0, columnspan=3,
                                                                                           padx=10, pady=12)
