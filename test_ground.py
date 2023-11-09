@@ -22,7 +22,7 @@ class MainWindow:
 
 
 
-        self.frame1 = frame.Log_In_Frame(self.window)
+        self.frame1 = frame.Identity_Frame(self.window)
 
 
 
