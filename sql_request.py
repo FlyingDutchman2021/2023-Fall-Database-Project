@@ -1,6 +1,14 @@
 import sqlite3
 
 
+#
+#
+# Checking Session
+# Checking the input from entry box
+#
+#
+
+
 # @Invalid scenarios
 # blank space or " or '
 # Consecutive dash symbol --
@@ -70,6 +78,7 @@ def _isEmail(entry: str) -> bool:
     return True
 
 
+# contact number type: 11 digits
 def _isContactNumber(entry: str) -> bool:
     if entry.isdigit() and len(entry) == 11:
         return True
@@ -77,12 +86,20 @@ def _isContactNumber(entry: str) -> bool:
         return False
 
 
+# ID type: 12 digits
 def _isID(entry: str) -> bool:
     if entry.isdigit():
         if len(entry) == 12:
             return True
     return False
 
+
+#
+#
+# SQL Request Session
+# Where stores all the SQL codes
+#
+#
 
 # For Patient, Doctor, Nurse separately? idk
 
@@ -108,35 +125,57 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
         return sqlite3.Error, []
 
 
+#
+# Find Session
+#
+
+
 # Find password according to id and type
 # Only return password
 # @para
 # _id: 12 digits integer,
 # _type: string either be 'P', 'D' or 'N'
 #
-def _find_password_id(_id: int, _type: str):
+def _find_password(_id: int, _type: str):
     sql = "SELECT password From password WHERE id = %d AND type = '%s'" % (_id, _type)
     return _sql_request(sql)
 
 
-# Find patient info using id (unique and primary key)
-# Return email, name, sex, birthdate, blood type, contact number, and notes
-def _find_patient_info_id(_id: int):
-    sql = "SELECT * FROM patient_info WHERE id = %d" % _id
-    return _sql_request(sql)
+# _target_table: 'patient' or 'doctor' or 'nurse'
+# _info: 'all', 'id'
+# _search_by: 'id' or 'contact' or 'email'
+# _search_key: just like it says! :)
+def _find_info(_target_table, _info: str, _search_by: str, _search_key: str | int):
+    table: str = ''
+    info: str = ''
+    search_sentence: str = ''
 
+    if _target_table == 'patient':
+        table = 'patient_info'
+    elif _target_table == 'doctor':
+        table = 'doctor_info'
+    elif _target_table == 'nurse':
+        table = 'nurse_info'
+    else:
+        print('_find_info_target_table_error')
 
-# Find patient info using contact number (unique)
-# Return email, name, sex, birthdate, blood type, contact number, and notes
-def _find_patient_info_contact_number(_contact_number: int):
-    sql = "SELECT * FROM patient_info WHERE contact_number = %d" % _contact_number
-    return _sql_request(sql)
+    if _info == 'all':
+        info = '*'
+    elif _info == 'id':
+        info = 'id'
+    else:
+        print('_find_info_info_error')
 
+    if _search_by == 'id':
+        search_sentence = "id = %d" % _search_key
+    elif _search_by == 'contact':
+        search_sentence = "contact_number = %d" % _search_key
+    elif _search_by == 'email':
+        search_sentence = "email = '%s'" % _search_key
+    else:
+        print('_find_info_search_by_error')
 
-# Find patient info using email (unique)
-# Return email, name, sex, birthdate, blood type, contact number, and notes
-def _find_patient_info_email(_email: str):
-    sql = "SELECT * FROM patient_info WHERE email = '%s'" % _email
+    sql = "SELECT %s FROM %s WHERE %s" % (info, table, search_sentence)
     return _sql_request(sql)
 
 
@@ -146,27 +185,48 @@ def _find_patient_info_email(_email: str):
 #
 #
 
+
 # TODO return one more thing: current user id (some may just have contact number or email address)
-# Return <status>
+# @para
+# _id_contact_email: the username entry
+# _password: the password entry
+# _identity: should be either 'patient', 'doctor' or 'nurse'
+# Return <status>, <id>
 # 'Success': successfully log in to the system
 # 'User not found': no such user exists
 # 'Wrong Password': password is wrong
 # 'Illegal username': username is illegal, containing some inputs that is not allowed for sql search
 # 'Invalid username': username is not any one of id, contact number or email
 #
-def login(_id_phone_email: str, _password: str, _identity: str):
-    _id_phone_email = _id_phone_email.strip()
-    if not _isValid(_id_phone_email):
+def login(_id_contact_email: str, _password: str, _identity: str):
+    _id_contact_email = _id_contact_email.strip()
+    if not _isValid(_id_contact_email):
         return 'Illegal username'
 
-    if _isContactNumber(_id_phone_email):
-        phone_number = int(_id_phone_email)
-        # TODO Phone Number search
-    elif _isID(_id_phone_email):
-        id = int(_id_phone_email)
-        # TODO id search
-    elif _isEmail(_id_phone_email):
-        email = _id_phone_email
-        # TODO email search
+    identity: str = ''
+    if _identity == 'patient':
+        identity = 'P'
+    elif _identity == 'doctor':
+        identity = 'D'
+    elif _identity == 'nurse':
+        identity = 'N'
+
+    if _isContactNumber(_id_contact_email):
+        contact_number = int(_id_contact_email)
+        uid = _find_info(_identity, 'id', 'contact', contact_number)[1][0][0]
+    elif _isID(_id_contact_email):
+        uid = int(_id_contact_email)
+    elif _isEmail(_id_contact_email):
+        email = _id_contact_email
+        uid = _find_info(_identity, 'id', 'email', email)[1][0][0]
     else:
         return 'Invalid username'
+
+    stored_password = _find_password(uid, identity)[1][0][0]
+    if stored_password == _password:
+        return 'Success', uid
+    else:
+        return 'Wrong Password'
+
+
+print(login('''example1@.com''', '985211001', 'patient'))
