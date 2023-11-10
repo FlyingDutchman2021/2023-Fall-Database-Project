@@ -195,13 +195,12 @@ def _find_info(_target_table, _info: str, _search_by: str, _search_key: str | in
 # 'Success': successfully log in to the system
 # 'User not found': no such user exists
 # 'Wrong Password': password is wrong
-# 'Illegal username': username is illegal, containing some inputs that is not allowed for sql search
 # 'Invalid username': username is not any one of id, contact number or email
 #
-def login(_id_contact_email: str, _password: str, _identity: str):
+def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
     _id_contact_email = _id_contact_email.strip()
     if not _isValid(_id_contact_email):
-        return 'Illegal username'
+        return 'Invalid username', 0
 
     identity: str = ''
     if _identity == 'patient':
@@ -213,20 +212,30 @@ def login(_id_contact_email: str, _password: str, _identity: str):
 
     if _isContactNumber(_id_contact_email):
         contact_number = int(_id_contact_email)
-        uid = _find_info(_identity, 'id', 'contact', contact_number)[1][0][0]
+        rtn_find_result = _find_info(_identity, 'id', 'contact', contact_number)[1]
+        if len(rtn_find_result) == 0:
+            return 'User not found', 0
+        else:
+            uid = rtn_find_result[0][0]
     elif _isID(_id_contact_email):
         uid = int(_id_contact_email)
     elif _isEmail(_id_contact_email):
         email = _id_contact_email
-        uid = _find_info(_identity, 'id', 'email', email)[1][0][0]
+        rtn_find_result = _find_info(_identity, 'id', 'email', email)[1]
+        if len(rtn_find_result) == 0:
+            return 'User not found', 0
+        else:
+            uid = rtn_find_result[0][0]
     else:
-        return 'Invalid username'
+        return 'Invalid username', 0
 
-    stored_password = _find_password(uid, identity)[1][0][0]
+    rtn_find_result = _find_password(uid, identity)[1]
+    if len(rtn_find_result) == 0:
+        return 'User not found', 0
+    else:
+        stored_password = rtn_find_result[0][0]
     if stored_password == _password:
         return 'Success', uid
     else:
-        return 'Wrong Password'
+        return 'Wrong Password', 0
 
-
-print(login('''example1@.com''', '985211001', 'patient'))
