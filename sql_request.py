@@ -198,6 +198,7 @@ def _find_info(_target_table, _info: str, _search_by: str, _search_key: str | in
 #
 def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
     _id_contact_email = _id_contact_email.strip()
+    _password = _password.strip()
     if not _isValid(_id_contact_email):
         return 'Invalid username', 0
 
