@@ -101,7 +101,6 @@ def _isID(entry: str) -> bool:
 #
 #
 
-# For Patient, Doctor, Nurse separately? idk
 
 # Base sql request framework
 # Return <status>, <result list>
@@ -238,4 +237,17 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
         return 'Success', uid
     else:
         return 'Wrong Password', 0
+
+
+# Get personal info using user ID and identity type
+# _id: user ID
+# _identity: can either be 'patient', 'doctor' or 'nurse'
+def get_personal_info(_id: int, _identity: str):
+    search_result = _find_info(_identity, 'all', 'id', _id)
+    if not search_result[0] == 'Success':
+        print('SQL error')
+    result_list = search_result[1]
+    if len(result_list) == 0:
+        print('User not found')
+    return result_list[0]
 
