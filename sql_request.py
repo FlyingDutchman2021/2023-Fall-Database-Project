@@ -1,4 +1,6 @@
+import config
 import sqlite3
+import bcrypt as bc
 
 
 #
@@ -124,19 +126,26 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
         return sqlite3.Error, []
 
 
-#
-# Find Session
-#
-
-
-# Find password according to id and type
+# Find password according to id and identity
 # Only return password
 # @para
 # _id: 12 digits integer,
-# _type: string either be 'P', 'D' or 'N'
+# _identity: string either be 'P', 'D' or 'N'
 #
-def _find_password(_id: int, _type: str):
-    sql = "SELECT password From password WHERE id = %d AND type = '%s'" % (_id, _type)
+def _find_password(_id: int, _identity: str):
+    sql = "SELECT password From password WHERE id = %d AND identity = '%s'" % (_id, _identity)
+    return _sql_request(sql)
+
+
+def _hash_new_password(_new_password: str) -> str:
+    pd = bytes(_new_password, 'utf-8')
+    salt = bc.gensalt(config.salt_round)
+    hpd = bc.hashpw(pd, salt)
+    return hpd.decode('utf-8')
+
+
+def _add_password(_id: int, _identity: str, _password: str):
+    sql = "INSERT INTO password (id, identity, password) VALUES (%d, '%s', '%s')" % (_id, _identity, _password)
     return _sql_request(sql)
 
 
@@ -234,13 +243,13 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
         return 'User not found', 0
     else:
         stored_password = rtn_find_result[0][0]
-    if stored_password == _password:
+    if bc.checkpw(_password.encode('utf-8'), stored_password.encode('utf-8')):
         return 'Success', uid
     else:
         return 'Wrong Password', 0
 
 
-# Get personal info using user ID and identity type
+# Get personal info using user ID and identity
 # _id: user ID
 # _identity: can either be 'patient', 'doctor' or 'nurse'
 def get_personal_info(_id: int, _identity: str):
@@ -252,3 +261,5 @@ def get_personal_info(_id: int, _identity: str):
         print('User not found')
     return result_list[0]
 
+
+print(login('100000000002', 'default', 'patient'))
