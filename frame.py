@@ -1,9 +1,6 @@
 import customtkinter as ctk
-import tkinter
-from tkinter import ttk
-import tkcalendar
-
-
+from tkinter import messagebox
+import sql_request
 class Base_Frame:
     def __init__(self, master):
         self.tk_frame = ctk.CTkFrame(master)
@@ -29,20 +26,20 @@ class Base_Frame:
             widget.destroy()
         Sign_up_Nurse_Frame(self.tk_frame)
 
-    def switch_Patient(self):
+    def switch_Patient(self, id):
         for widget in self.tk_frame.winfo_children():
             widget.destroy()
-        Patient_Frame(self.tk_frame)
+        Patient_Frame(self.tk_frame, id)
 
-    def switch_Doctor(self):
+    def switch_Doctor(self, id):
         for widget in self.tk_frame.winfo_children():
             widget.destroy()
-        Doctor_Frame(self.tk_frame)
+        Doctor_Frame(self.tk_frame,id)
 
-    def switch_Nurse(self):
+    def switch_Nurse(self, id):
         for widget in self.tk_frame.winfo_children():
             widget.destroy()
-        Nurse_Frame(self.tk_frame)
+        Nurse_Frame(self.tk_frame, id)
 
 
 class Identity_Frame(Base_Frame):
@@ -52,11 +49,11 @@ class Identity_Frame(Base_Frame):
 
         ctk.CTkLabel(master=self.frame, text="Choose your identity", width=200).grid(
             row=0, column=0, columnspan=3, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Patient", width=10, command=lambda: self.Log_In("Patient")).grid(
+        ctk.CTkButton(master=self.frame, text="Patient", width=10, command=lambda: self.Log_In("patient")).grid(
             row=1, column=0, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Doctor", width=10, command=lambda: self.Log_In("Doctor")).grid(
+        ctk.CTkButton(master=self.frame, text="Doctor", width=10, command=lambda: self.Log_In("doctor")).grid(
             row=1, column=1, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Nurse", width=10, command=lambda: self.Log_In("Nurse")).grid(
+        ctk.CTkButton(master=self.frame, text="Nurse", width=10, command=lambda: self.Log_In("nurse")).grid(
             row=1, column=2, padx=10, pady=12)
 
         self.frame.pack()
@@ -67,7 +64,7 @@ class Identity_Frame(Base_Frame):
 
 class Log_In_Frame(Base_Frame):
 
-    def __init__(self, master, identity):
+    def __init__(self, master, identity: str):
         super().__init__(master)
 
         self.identity = identity
@@ -75,7 +72,7 @@ class Log_In_Frame(Base_Frame):
         self.password = ctk.StringVar()
         self.frame = ctk.CTkFrame(self.tk_frame)
 
-        ctk.CTkLabel(master=self.frame, text='Phone Number').grid(row=0, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Account').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=self.frame, text='Password').grid(row=1, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.account, width=200).grid(
             row=0, column=1, columnspan=2, padx=10, pady=12)
@@ -90,19 +87,24 @@ class Log_In_Frame(Base_Frame):
         self.frame.pack()
 
     def Log_in(self):
-        if self.identity == "Patient":
-            self.switch_Patient()
-        if self.identity == "Doctor":
-            self.switch_Doctor()
-        if self.identity == "Nurse":
-            self.switch_Nurse()
+        status, id = sql_request.login(str(self.account.get()), str(self.password.get()), self.identity)
+        if status == 'Success':
+            if self.identity == "patient":
+                self.switch_Patient(id)
+            if self.identity == "doctor":
+                self.switch_Doctor(id)
+            if self.identity == "nurse":
+                self.switch_Nurse(id)
+        else:
+            messagebox.showerror('Error', status)
+
 
     def Sign_up(self):
-        if self.identity == "Patient":
+        if self.identity == "patient":
             self.switch_Sign_Up_Patient()
-        if self.identity == "Doctor":
+        if self.identity == "doctor":
             self.switch_Sign_Up_Doctor()
-        if self.identity == "Nurse":
+        if self.identity == "nurse":
             self.switch_Sign_Up_Nurse()
 
 
@@ -177,7 +179,7 @@ class Sign_up_Patient_Frame(Base_Frame):
 
     def Password_confirmation(self, *args):
         self.Label.set('')
-        if (self.password.get() != '' and self.password_.get() != ''):
+        if self.password.get() != '' and self.password_.get() != '':
             if self.password.get() == self.password_.get():
                 self.Label.set('Pass')
             else:
@@ -274,14 +276,14 @@ class Sign_up_Doctor_Frame(Base_Frame):
             row=8, column=3, padx=10, pady=12)
         self.frame.pack()
 
-
     def Password_confirmation(self, *args):
         self.Label.set('')
-        if(self.password.get() != '' and self.password_.get() != ''):
+        if self.password.get() != '' and self.password_.get() != '':
             if self.password.get() == self.password_.get():
                 self.Label.set('Pass')
             else:
                 self.Label.set('Fail')
+
     def show_day(self, *args):
         self._day.set('')
         day = []
@@ -301,7 +303,7 @@ class Sign_up_Doctor_Frame(Base_Frame):
                 else:
                     for i in range(28):
                         day.append(str(1 + i))
-            self._day.configure(values= day)
+            self._day.configure(values = day)
 
 class Sign_up_Nurse_Frame(Base_Frame):
     def __init__(self, master):
@@ -376,7 +378,7 @@ class Sign_up_Nurse_Frame(Base_Frame):
 
     def Password_confirmation(self, *args):
         self.Label.set('')
-        if (self.password.get() != '' and self.password_.get() != ''):
+        if  self.password.get() != '' and self.password_.get() != '':
             if self.password.get() == self.password_.get():
                 self.Label.set('Pass')
             else:
@@ -405,9 +407,10 @@ class Sign_up_Nurse_Frame(Base_Frame):
 
 
 class Patient_Frame(Base_Frame):
-    def __init__(self, master):
+    def __init__(self, master, id):
         super().__init__(master)
 
+        self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
 
@@ -419,9 +422,10 @@ class Patient_Frame(Base_Frame):
 
 
 class Doctor_Frame(Base_Frame):
-    def __init__(self, master):
+    def __init__(self, master, id):
         super().__init__(master)
 
+        self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
 
@@ -433,9 +437,10 @@ class Doctor_Frame(Base_Frame):
 
 
 class Nurse_Frame(Base_Frame):
-    def __init__(self, master):
+    def __init__(self, master, id):
         super().__init__(master)
 
+        self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
 
