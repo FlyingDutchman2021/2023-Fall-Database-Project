@@ -27,6 +27,8 @@ def _isValid(entry: str) -> bool:
     return True
 
 
+# TODO add purifying codes and another isValid code
+
 def _isEmail(entry: str) -> bool:
     length = len(entry)
     key_position: [int] = []
@@ -149,6 +151,16 @@ def _add_password(_id: int, _identity: str, _password: str):
     return _sql_request(sql)
 
 
+def _delete_password(_id: int, _identity: str):
+    sql = "DELETE FROM password WHERE id = %d and identity = '%s'" % (_id, _identity)
+    return _sql_request(sql)
+
+
+def _update_password(_id: int, _identity: str, _password: str):
+    sql = "UPDATE password SET password = '%s' WHERE id = %d and identity = '%s'" % (_password, _id, _identity)
+    return _sql_request(sql)
+
+
 # _target_table: 'patient' or 'doctor' or 'nurse'
 # _info: 'all', 'id'
 # _search_by: 'id' or 'contact' or 'email'
@@ -185,6 +197,37 @@ def _find_info(_target_table, _info: str, _search_by: str, _search_key: str | in
 
     sql = "SELECT %s FROM %s WHERE %s" % (info, table, search_sentence)
     return _sql_request(sql)
+
+
+def _add_patient_info(_email: str, _name: str, _sex: str, _birth_date: int,
+                      _blood_type: str, _contact_number: int, _note: str = ''):
+    sql = ("INSERT INTO patient_info (email, name, sex, birth_date, blood_type, contact_number, note) VALUES ('%s', "
+           "'%s', '%s', %d, '%s', %d, '%s')") % (_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    return _sql_request(sql)
+
+
+def _delete_patient_info(_id: int):
+    sql = "DELETE FROM patient_info WHERE id = %d" % _id
+    return _sql_request(sql)
+
+
+def _update_patient_info(_id: int, **kwargs):
+    sql = "UPDATE patient_info SET "
+    option_keys = []
+    option_values = []
+    for item in kwargs:
+        option_keys.append(item)
+        option_values.append(kwargs[item])
+
+    total_option_number = len(option_keys)
+
+    for i in range(total_option_number - 1):
+        sql = sql + option_keys[i] + " = '" + option_values[i] + "' and "
+    sql = (sql + option_keys[total_option_number - 1] + " = '" + option_values[total_option_number - 1]
+           + "' WHERE id = %d" % _id)
+    return _sql_request(sql)
+
+
 
 
 #
@@ -260,6 +303,3 @@ def get_personal_info(_id: int, _identity: str):
     if len(result_list) == 0:
         print('User not found')
     return result_list[0]
-
-
-print(login('100000000002', 'default', 'patient'))
