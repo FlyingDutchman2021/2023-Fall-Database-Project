@@ -20,11 +20,29 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" object-ref="schemas/main/tables/patient_info" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.tests" active-filter-id="18faf403-76c2-4da0-9558-90076ca8798b">
+      <filter id="18faf403-76c2-4da0-9558-90076ca8798b" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="id" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.prescriptions" active-filter-id="3071d6f4-4b1c-40f2-b02f-d0ab32a1a012">
+      <filter id="3071d6f4-4b1c-40f2-b02f-d0ab32a1a012" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="id" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.pending_doctor_info" active-filter-id="993b7c94-7f56-4944-980b-d766e21dcf9c">
+      <filter id="993b7c94-7f56-4944-980b-d766e21dcf9c" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="pending_id" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.sqlite_sequence" active-filter-id="504ffddb-f0d4-4b47-9559-9e642b4fd994">
+      <filter id="504ffddb-f0d4-4b47-9559-9e642b4fd994" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="name" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.patient_info" active-filter-id="2964dba1-2760-4d97-8209-a226a717ed26">
       <filter id="2964dba1-2760-4d97-8209-a226a717ed26" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND">
         <condition column="id" operator="is not null" value="" active="false" />
@@ -33,6 +51,11 @@
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.nurse_info" active-filter-id="26de376f-951a-4e68-b5aa-165d34a47d9c">
       <filter id="26de376f-951a-4e68-b5aa-165d34a47d9c" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
         <condition column="id" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.nurse_assignment" active-filter-id="223cc67d-907e-49c7-afdb-636c09129385">
+      <filter id="223cc67d-907e-49c7-afdb-636c09129385" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="nurse_id" operator="=" value="" active="false" />
       </filter>
     </filter-actions>
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.password" active-filter-id="EMPTY_FILTER">

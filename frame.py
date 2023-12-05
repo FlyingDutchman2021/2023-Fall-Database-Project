@@ -676,6 +676,8 @@ class Doctor_Frame(Base_Frame):
         ctk.CTkLabel(master=frame, text='Doctor').grid(row=0, column=5, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=ID, width=100).grid(
             row=1, column=0, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=ID, width=100).grid(
+            row=2, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=Name, width=100).grid(
             row=1, column=1, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=Gender, width=100).grid(
@@ -688,6 +690,8 @@ class Doctor_Frame(Base_Frame):
             row=1, column=5, padx=10, pady=12)
         ctk.CTkButton(master=frame, text="Search", width=5, command=lambda: Search()).grid(
             row=1, column=6, padx=10, pady=12)
+        ctk.CTkButton(master=frame, text="Medical records", width=5, command=lambda: medical_records()).grid(
+            row=2, column=6, padx=10, pady=12)
 
         tree = ttk.Treeview(frame,show="headings",height=20)
         tree["columns"] = ("id", "name", "gender", "birthday", "contact number", "doctor")
@@ -703,13 +707,41 @@ class Doctor_Frame(Base_Frame):
         tree.heading("birthday", text="Birthday")
         tree.heading("contact number", text="Contact Number")
         tree.heading("doctor", text="Doctor")
-        tree.grid(row=2, column=0, columnspan=6, rowspan=5, padx=10, pady=12)
+        tree.grid(row=3, column=0, columnspan=6, rowspan=5, padx=10, pady=12)
 
         Info = sql_request.get_personal_info(self.id, 'patient')
         tree.insert("",0,values=(Info[0],Info[2],Info[3],Info[4],Info[6]))
 
         def Search():
             pass
+
+        def medical_records():
+            for widget in self.frame2.winfo_children():
+                widget.destroy()
+
+            frame = ctk.CTkFrame(self.frame2)
+            frame.pack(expand="yes")
+            text = ctk.StringVar()
+
+            tree = ttk.Treeview(frame, show="headings",height=20)
+            tree["columns"] = ("Time", "Doctor", "Content")
+            tree.column("Time", width=100, anchor='center')
+            tree.column("Doctor", width=100, anchor='center')
+            tree.column("Content", width=500, anchor='center')
+            tree.heading("Time", text="Time")
+            tree.heading("Doctor", text="Doctor")
+            tree.heading("Content", text="Content")
+            tree.insert("", 0, values=("20231205", "Mr.1", "111111111"))
+            tree.grid(row=1, column=0, columnspan=7, rowspan=10, padx=10, pady=12)
+            ctk.CTkEntry(master=frame, textvariable=text, width=300).grid(
+                row=0, column=2, padx=10, pady=12)
+            ctk.CTkButton(master=frame, text="Add", width=5, command=lambda: add()).grid(
+                row=0, column=5, padx=10, pady=12)
+            ctk.CTkButton(master=frame, text="Back", width=5, command=lambda: self.switch_Doctor(self.id)).grid(
+                row=0, column=6, padx=10, pady=12)
+
+            def add():
+                pass
 
 
     def Personal_Information(self):
