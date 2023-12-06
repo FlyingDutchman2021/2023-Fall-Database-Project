@@ -11,23 +11,27 @@ import bcrypt as bc
 #
 
 
-# @Invalid scenarios
-# blank space or " or '
-# Consecutive dash symbol --
-def _isValid(entry: str) -> bool:
-    for i in range(len(entry)):
-        char = entry[i]
-        if char == ' ' or char == '"' or char == "'":
-            return False
-        if char == '-':
-            if i < len(entry) - 1:
-                if entry[i + 1] == '-':
-                    return False
+# Purify a string for sql execution
+# adding extra ' behind '
+def _purify(_input: str):
+    _input = _input.strip()
+    length = len(_input)
+    where_we_need_extra_care: [int] = [0]
+    for i in range(length):
+        char = _input[i]
+        if char == "'":
+            where_we_need_extra_care.append(i+1)
+    where_we_need_extra_care.append(length)
+    combined_result: str = ""
+    for i in range(len(where_we_need_extra_care)-1):
+        start = where_we_need_extra_care[i]
+        end = where_we_need_extra_care[i+1]
+        combined_result = combined_result + _input[start:end] + "'"
+    combined_result = combined_result[0:len(combined_result)-1]
+    return combined_result
 
-    return True
 
 
-# TODO add purifying codes and another isValid code
 
 def _isEmail(entry: str) -> bool:
     length = len(entry)
@@ -45,6 +49,17 @@ def _isEmail(entry: str) -> bool:
         return False
 
     # Verify the legality of each part
+    # Verify the front part
+    for i in range(1):
+        start_point = 0
+        end_point = key_position[0]
+        if end_point - start_point < 1:
+            return False
+        for j in range(start_point, end_point):
+            char = entry[j]
+            print(char)
+            if char.isspace():
+                return False
     # Verify the middle parts
     for i in range(len(key_position) - 1):
         start_point = key_position[i] + 1
@@ -211,48 +226,19 @@ def _delete_patient_info(_id: int):
     return _sql_request(sql)
 
 
-def _update_patient_info(_id: int, **kwargs):
-    sql = "UPDATE patient_info SET "
-    option_keys = []
-    option_values = []
-    for item in kwargs:
-        option_keys.append(item)
-        option_values.append(kwargs[item])
-
-    total_option_number = len(option_keys)
-
-    for i in range(total_option_number - 1):
-        sql = sql + option_keys[i] + " = '" + option_values[i] + "' and "
-    sql = (sql + option_keys[total_option_number - 1] + " = '" + option_values[total_option_number - 1]
-           + "' WHERE id = %d" % _id)
+def _update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_date: int,
+                         _blood_type: str, _contact_number: int, _note: str = ''):
+    sql = ("UPDATE patient_info SET email = '%s', name = '%s', sex = '%s', birth_date = %d, "
+           "blood_type = '%s', contact_number = %d, note = '%s' WHERE id = %d ") % (_email, _name, _sex,
+                                                                                    _birth_date, _blood_type,
+                                                                                    _contact_number, _note,
+                                                                                    _id)
     return _sql_request(sql)
 
 
-
-
-#
-#
-# Public functions
-#
-#
-
-
-# TODO return one more thing: current user id (some may just have contact number or email address)
-# @para
-# _id_contact_email: the username entry
-# _password: the password entry
-# _identity: should be either 'patient', 'doctor' or 'nurse'
-# Return <status>, <id>
-# 'Success': successfully log in to the system
-# 'User not found': no such user exists
-# 'Wrong Password': password is wrong
-# 'Invalid username': username is not any one of id, contact number or email
-#
 def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
-    _id_contact_email = _id_contact_email.strip()
-    _password = _password.strip()
-    if not _isValid(_id_contact_email):
-        return 'Invalid username', 0
+    _id_contact_email = _purify(_id_contact_email)
+    _password = _purify(_password)
 
     identity: str = ''
     if _identity == 'patient':
@@ -303,3 +289,17 @@ def get_personal_info(_id: int, _identity: str):
     if len(result_list) == 0:
         print('User not found')
     return result_list[0]
+
+
+def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: str,
+                     _blood_type: str, _contact_number: str, _note: str):
+    # Check email, name, contact_number, note
+    # Purify Everything
+    if not _isEmail(_email):
+        return
+    if not _isContactNumber(_contact_number):
+        return
+    _email = _purify(_email)
+    _name = _purify(_name)
+    _contact_number = _purify(_contact_number)
+    _note = _purify(_note)
