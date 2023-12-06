@@ -3,7 +3,6 @@ import sqlite3
 import bcrypt as bc
 
 
-# Hello my friends!
 #
 #
 # Checking Session
@@ -21,17 +20,15 @@ def _purify(_input: str):
     for i in range(length):
         char = _input[i]
         if char == "'":
-            where_we_need_extra_care.append(i+1)
+            where_we_need_extra_care.append(i + 1)
     where_we_need_extra_care.append(length)
     combined_result: str = ""
-    for i in range(len(where_we_need_extra_care)-1):
+    for i in range(len(where_we_need_extra_care) - 1):
         start = where_we_need_extra_care[i]
-        end = where_we_need_extra_care[i+1]
+        end = where_we_need_extra_care[i + 1]
         combined_result = combined_result + _input[start:end] + "'"
-    combined_result = combined_result[0:len(combined_result)-1]
+    combined_result = combined_result[0:len(combined_result) - 1]
     return combined_result
-
-
 
 
 def _isEmail(entry: str) -> bool:
@@ -283,13 +280,7 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
 # _id: user ID
 # _identity: can either be 'patient', 'doctor' or 'nurse'
 def get_personal_info(_id: int, _identity: str):
-    search_result = _find_info(_identity, 'all', 'id', _id)
-    if not search_result[0] == 'Success':
-        print('SQL error')
-    result_list = search_result[1]
-    if len(result_list) == 0:
-        print('User not found')
-    return result_list[0]
+    return _find_info(_identity, 'all', 'id', _id)
 
 
 def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: str,
@@ -297,10 +288,49 @@ def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: str,
     # Check email, name, contact_number, note
     # Purify Everything
     if not _isEmail(_email):
-        return
+        return 'error: Email Format'
     if not _isContactNumber(_contact_number):
-        return
+        return 'error: Contact Number Format'
     _email = _purify(_email)
     _name = _purify(_name)
     _contact_number = _purify(_contact_number)
     _note = _purify(_note)
+
+    # Turn str to int
+    _birth_date = int(_birth_date)
+    _contact_number = int(_contact_number)
+
+    # Add Info
+    return _add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+
+
+def delete_patient_info():
+    pass
+
+
+def update_patient_info():
+    pass
+
+
+def add_doctor_info():
+    pass
+
+
+def update_doctor_info():
+    pass
+
+
+def delete_doctor_info():
+    pass
+
+
+def add_nurse_info():
+    pass
+
+
+def update_nurse_info():
+    pass
+
+
+def delete_nurse_info():
+    pass
