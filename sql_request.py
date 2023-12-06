@@ -3,6 +3,7 @@ import sqlite3
 import bcrypt as bc
 
 
+# Hello my friends!
 #
 #
 # Checking Session
