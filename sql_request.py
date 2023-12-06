@@ -2,6 +2,8 @@ import _sql_request as db
 import bcrypt as bc
 
 
+# Return <status>, possible status:
+# SQL Error, User not found, Invalid username, Success, Wrong Password
 def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
     _id_contact_email = db.purify(_id_contact_email)
     _password = db.purify(_password)
@@ -16,7 +18,9 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
 
     if db.isContactNumber(_id_contact_email):
         contact_number = int(_id_contact_email)
-        rtn_find_result = db.find_info(_identity, 'id', 'contact', contact_number)[1]
+        status, rtn_find_result = db.find_info(_identity, 'id', 'contact', contact_number)
+        if not status == 'Success':
+            return 'SQL Error', 0
         if len(rtn_find_result) == 0:
             return 'User not found', 0
         else:
@@ -25,7 +29,9 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
         uid = int(_id_contact_email)
     elif db.isEmail(_id_contact_email):
         email = _id_contact_email
-        rtn_find_result = db.find_info(_identity, 'id', 'email', email)[1]
+        status, rtn_find_result = db.find_info(_identity, 'id', 'email', email)
+        if not status == 'Success':
+            return 'SQL Error', 0
         if len(rtn_find_result) == 0:
             return 'User not found', 0
         else:
@@ -33,7 +39,9 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
     else:
         return 'Invalid username', 0
 
-    rtn_find_result = db.find_password(uid, identity)[1]
+    status, rtn_find_result = db.find_password(uid, identity)
+    if not status == 'Success':
+        return 'SQL Error', 0
     if len(rtn_find_result) == 0:
         return 'User not found', 0
     else:
@@ -44,14 +52,9 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
         return 'Wrong Password', 0
 
 
-# Get personal info using user ID and identity
-# _id: user ID
-# _identity: can either be 'patient', 'doctor' or 'nurse'
-def get_personal_info(_id: int, _identity: str):
-    return db.find_info(_identity, 'all', 'id', _id)
-
-
-def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: str,
+# Return <status>, possible status:
+# error: Email Format, error: Contact Number Format, Success, SQL Error
+def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
                      _blood_type: str, _contact_number: str, _note: str):
     # Check email, name, contact_number, note
     # Purify Everything
@@ -69,15 +72,73 @@ def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: str,
     _contact_number = int(_contact_number)
 
     # Add Info
-    return db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    status, result_list = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    if status == 'Success':
+        return 'Success'
+    else:
+        return 'SQL Error'
 
 
-def delete_patient_info():
+
+def register_doctor():
     pass
 
 
-def update_patient_info():
+def register_nurse():
     pass
+
+
+# Get personal info using user ID and identity
+#
+# _id: user ID
+# _identity: can either be 'patient', 'doctor' or 'nurse'
+#
+# Return <status>, <list_of_result>
+# possible status:
+# Success, SQL Error
+def get_personal_info(_id: int, _identity: str):
+    status, result = db.find_info(_identity, 'all', 'id', _id)
+    if status == 'Success':
+        return status, result
+    else:
+        return 'SQL Error', []
+
+
+# Return <status>
+# possible status:
+# error: Email Format, error: Contact Number Format, Success, SQL Error
+def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_date: str,
+                        _blood_type: str, _contact_number: str, _note: str):
+    if not db.isEmail(_email):
+        return 'error: Email Format'
+    if not db.isContactNumber(_contact_number):
+        return 'error: Contact Number Format'
+    _email = db.purify(_email)
+    _name = db.purify(_name)
+    _contact_number = db.purify(_contact_number)
+    _note = db.purify(_note)
+
+    # Turn str to int
+    _birth_date = int(_birth_date)
+    _contact_number = int(_contact_number)
+
+    # Add Info
+    status, result = db.update_patient_info(_id, _email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    if status == 'Success':
+        return status
+    else:
+        return 'SQL Error'
+
+
+# Return <status>
+# possible status:
+# error: Success, SQL Error
+def delete_patient_info(_id: int):
+    status, result = db.delete_patient_info(_id)
+    if status == 'Success':
+        return 'Success'
+    else:
+        return 'SQL Error'
 
 
 def add_doctor_info():

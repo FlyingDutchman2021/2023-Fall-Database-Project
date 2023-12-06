@@ -103,16 +103,8 @@ def isID(entry: str) -> bool:
     return False
 
 
-#
-#
-# SQL Request Session
-# Where stores all the SQL codes
-#
-#
-
-
 # Base sql request framework
-# Return <status>, <result list>
+# Return <status>, <result_list>
 # <status>:
 # 'Success': The SQL is executed successfully
 # <error>: The SQL can not be executed due to some database level error
@@ -134,11 +126,9 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
 
 
 # Find password according to id and identity
-# Only return password
-# @para
+#
 # _id: 12 digits integer,
 # _identity: string either be 'P', 'D' or 'N'
-#
 def find_password(_id: int, _identity: str):
     sql = "SELECT password From password WHERE id = %d AND identity = '%s'" % (_id, _identity)
     return _sql_request(sql)
