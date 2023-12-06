@@ -79,12 +79,33 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
         return 'SQL Error'
 
 
+# Return <status>
+# possible status:
+# error: Success, SQL Error
+def delete_patient_account(_id: int):
+    status1, result = db.delete_patient_info(_id)
+    status2, result = db.delete_password(_id, 'P')
+    if status1 == 'Success' and status2 == 'Success':
+        return 'Success'
+    else:
+        return 'SQL Error'
+
+
+
 
 def register_doctor():
     pass
 
 
+def delete_doctor_account():
+    pass
+
+
 def register_nurse():
+    pass
+
+
+def delete_nurse_account():
     pass
 
 
@@ -130,36 +151,10 @@ def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_dat
         return 'SQL Error'
 
 
-# Return <status>
-# possible status:
-# error: Success, SQL Error
-def delete_patient_info(_id: int):
-    status, result = db.delete_patient_info(_id)
-    if status == 'Success':
-        return 'Success'
-    else:
-        return 'SQL Error'
-
-
-def add_doctor_info():
-    pass
-
-
 def update_doctor_info():
-    pass
-
-
-def delete_doctor_info():
-    pass
-
-
-def add_nurse_info():
     pass
 
 
 def update_nurse_info():
     pass
 
-
-def delete_nurse_info():
-    pass
