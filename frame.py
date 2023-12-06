@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from tkinter import messagebox, ttk
 import sql_request
+
+
 class Base_Frame:
     def __init__(self, master):
         self.tk_frame = ctk.CTkFrame(master)
@@ -305,6 +307,7 @@ class Sign_up_Doctor_Frame(Base_Frame):
                         day.append(str(1 + i))
             self._day.configure(values = day)
 
+
 class Sign_up_Nurse_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -602,11 +605,6 @@ class Patient_Frame(Base_Frame):
                 self.Label2.set('Pass')
             else:
                 self.Label2.set('Fail')
-
-
-
-
-
 
 
 class Doctor_Frame(Base_Frame):
@@ -1057,3 +1055,5 @@ class Nurse_Frame(Base_Frame):
                 self.Label2.set('Pass')
             else:
                 self.Label2.set('Fail')
+
+# TODO   管理员界面，开药方的界面，开检查单的界面，分配病房的界面（护士长），病房查看的界面，药房的界面
