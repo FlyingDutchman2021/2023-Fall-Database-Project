@@ -115,7 +115,6 @@ def delete_patient_account(_id: int):
 
 
 def register_doctor(email: str, name: str, sex: str, contact_number: str, password: str):
-    pass
     # Check entry inputs
     if not db.isEmail(email):
         return 'error: Format'
