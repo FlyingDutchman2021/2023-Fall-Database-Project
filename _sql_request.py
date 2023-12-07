@@ -180,7 +180,7 @@ def show_info(_target_table: str, start: int, number_of_page: int):
 # _info: 'all', 'id'
 # _search_by: 'id' or 'contact' or 'email'
 # _search_key: just like it says! :)
-def find_info(_target_table, _info: str, _search_by: str, _search_key: str | int):
+def find_info(_target_table, _info: str, _search_by: str, _search_key):
     table: str = ''
     info: str = ''
     search_sentence: str = ''
