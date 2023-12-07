@@ -45,6 +45,10 @@ class Base_Frame:
             widget.destroy()
         Nurse_Frame(self.tk_frame, id)
 
+    def switch_Administrator(self,id):
+        for widget in self.tk_frame.winfo_children():
+            widget.destroy()
+        Administrator_Frame(self.tk_frame, id)
 
 class Identity_Frame(Base_Frame):
     def __init__(self, master):
@@ -98,7 +102,10 @@ class Log_In_Frame(Base_Frame):
             if self.identity == "patient":
                 self.switch_Patient(id)
             if self.identity == "doctor":
-                self.switch_Doctor(id)
+                if id == "10086":
+                    self.switch_Administrator(id)
+                else:
+                    self.switch_Doctor(id)
             if self.identity == "nurse":
                 self.switch_Nurse(id)
         else:
@@ -200,9 +207,6 @@ class Sign_up_Patient_Frame(Base_Frame):
         # 确认按钮，点击后提交注册
         ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(row=10, column=1, padx=10,
                                                                                              pady=12)
-        #不理解密码确认要用在哪里
-        # ctk.CTkButton(master=self.frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
-        #     row=8, column=1, padx=10, pady=12)
 
 
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("patient")).grid(
@@ -283,10 +287,6 @@ class Sign_up_Patient_Frame(Base_Frame):
             self.password.get()
         )
 
-        # self.birthday_year = ctk.StringVar()
-        # self.birthday_month = ctk.StringVar()
-        # self.birthday_day = ctk.StringVar()
-
         if result == 'Success':
             messagebox.showinfo("Success", "Registration successful")
             self.switch_Log_In("patient")
@@ -317,12 +317,6 @@ class Sign_up_Doctor_Frame(Base_Frame):
         self.password_ = ctk.StringVar()
         self.Label = ctk.StringVar()
         self.frame = ctk.CTkFrame(self.tk_frame)
-        self.year = []
-        self.month = []
-        for i in range(100):
-            self.year.append(str(1930 + i))
-        for i in range(12):
-            self.month.append(str(1 + i))
 
         ctk.CTkLabel(master=self.frame, text="Please enter your message", width=200).grid(
             row=0, column=0, columnspan=4, padx=10, pady=12)
@@ -368,27 +362,6 @@ class Sign_up_Doctor_Frame(Base_Frame):
                 self.Label.set('Pass')
             else:
                 self.Label.set('Fail')
-
-    def show_day(self, *args):
-        self._day.set('')
-        day = []
-        if self.birthday_month.get() != '' and self.birthday_year.get() != '':
-            month = int(self.birthday_month.get())
-            if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
-                for i in range(31):
-                    day.append(str(1 + i))
-            elif month != 2:
-                for i in range(30):
-                    day.append(str(1 + i))
-            else:
-                year = int(self.birthday_year.get())
-                if year % 4 == 0 and year % 100 != 0 or year % 400 == 0:
-                    for i in range(29):
-                        day.append(str(1 + i))
-                else:
-                    for i in range(28):
-                        day.append(str(1 + i))
-            self._day.configure(values = day)
 
     # 获得输入信息，注册，返回注册结果
     def register(self):
@@ -446,12 +419,6 @@ class Sign_up_Nurse_Frame(Base_Frame):
         self.password_ = ctk.StringVar()
         self.Label = ctk.StringVar()
         self.frame = ctk.CTkFrame(self.tk_frame)
-        self.year = []
-        self.month = []
-        for i in range(100):
-            self.year.append(str(1930 + i))
-        for i in range(12):
-            self.month.append(str(1 + i))
 
         ctk.CTkLabel(master=self.frame, text="Please enter your message", width=200).grid(
             row=0, column=0, columnspan=4, padx=10, pady=12)
@@ -497,29 +464,6 @@ class Sign_up_Nurse_Frame(Base_Frame):
                 self.Label.set('Pass')
             else:
                 self.Label.set('Fail')
-
-    def show_day(self, *args):
-        self._day.set('')
-        day = []
-        if self.birthday_month.get() != '' and self.birthday_year.get() != '':
-            month = int(self.birthday_month.get())
-            if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
-                for i in range(31):
-                    day.append(str(1 + i))
-            elif month != 2:
-                for i in range(30):
-                    day.append(str(1 + i))
-            else:
-                year = int(self.birthday_year.get())
-                if year % 4 == 0 and year % 100 != 0 or year % 400 == 0:
-                    for i in range(29):
-                        day.append(str(1 + i))
-                else:
-                    for i in range(28):
-                        day.append(str(1 + i))
-            self._day.configure(values=day)
-
-        # 获得输入信息，注册，返回注册结果
 
     def register(self):
         # 输入验证
@@ -676,7 +620,6 @@ class Patient_Frame(Base_Frame):
         ctk.CTkEntry(master=frame, textvariable=self.password_entry, width=300).pack()
         ctk.CTkLabel(master=frame, textvariable=self.Label1, width=5).pack()
         self.password_entry.trace_add("write", self.Modify)
-
 
     def Modify(self,*args):
         self.Label1.set('')
@@ -1031,6 +974,340 @@ class Doctor_Frame(Base_Frame):
 
 
 class Nurse_Frame(Base_Frame):
+    def __init__(self, master, id):
+        super().__init__(master)
+
+        self.id = id
+        self.frame1 = ctk.CTkFrame(self.tk_frame)
+        self.frame2 = ctk.CTkFrame(self.tk_frame)
+        Info = sql_request.get_personal_info(self.id, 'nurse')
+
+        self.name = ctk.StringVar()
+        self.name.set(Info[2])
+        self.birthday = ctk.StringVar()
+        self.birthday_year = ctk.StringVar()
+        self.birthday_month = ctk.StringVar()
+        self.birthday_day = ctk.StringVar()
+        self.gender = ctk.StringVar()
+        self.gender.set(Info[3])
+        self.contact_number = ctk.StringVar()
+        self.contact_number.set(Info[4])
+        self.email = ctk.StringVar()
+        self.email.set(Info[1])
+        self.password = ctk.StringVar()
+        self.password_ = ctk.StringVar()
+        self.password_entry = ctk.StringVar()
+        self.department = ctk.StringVar()
+        self.department.set(Info[5])
+        self.Label1 = ctk.StringVar()
+        self.Label2 = ctk.StringVar()
+
+        self.year = []
+        self.month = []
+        for i in range(100):
+            self.year.append(str(1930 + i))
+        for i in range(12):
+            self.month.append(str(1 + i))
+
+        ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, textvariable=self.name).pack(padx=10, pady=12)
+        ctk.CTkButton(master=self.frame1, text="Nursing wards", width=5,
+                      command=lambda: self.Nursing_wards()).pack(padx=10, pady=12)
+        ctk.CTkButton(master=self.frame1, text="Personal Information", width=5,
+                      command=lambda: self.Personal_Information()).pack(padx=10, pady=12)
+
+        self.frame1.pack(side='left', padx=10, fill='y')
+        self.frame2.pack(side='left', padx=10, fill='both', expand="yes")
+
+    def Nursing_wards(self):
+        pass
+
+    def Personal_Information(self):
+        for widget in self.frame2.winfo_children():
+            widget.destroy()
+
+        frame3 = ctk.CTkFrame(self.frame2)
+
+        ctk.CTkLabel(master=frame3, text='Name').grid(row=1, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, text='Birthday').grid(row=2, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, text='Gender').grid(row=3, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, text='Contact number').grid(row=4, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, text='Email').grid(row=5, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, text='Department').grid(row=6, column=0, padx=10, pady=12)
+
+        ctk.CTkLabel(master=frame3, textvariable=self.name, width=300).grid(
+            row=1, column=1, columnspan=3, padx=10, pady=12)
+
+        ctk.CTkLabel(master=frame3, textvariable=self.birthday_year, width=80).grid(
+            row=2, column=1, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, textvariable=self.birthday_month, width=80).grid(
+            row=2, column=2, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, textvariable=self.birthday_day, width=80).grid(
+            row=2, column=3, padx=10, pady=12)
+
+        ctk.CTkLabel(master=frame3, textvariable=self.gender, width=300).grid(
+            row=3, column=1, columnspan=3, padx=10, pady=12)
+
+        ctk.CTkLabel(master=frame3, textvariable=self.contact_number, width=300).grid(
+            row=4, column=1, columnspan=3, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, textvariable=self.email, width=300).grid(
+            row=5, column=1, columnspan=3, padx=10, pady=12)
+        ctk.CTkLabel(master=frame3, textvariable=self.department, width=300).grid(
+            row=6, column=1, columnspan=3, padx=10, pady=12)
+        ctk.CTkButton(master=frame3, text='Modify', command=lambda: self.Password_()).grid(
+            row=7, column=2, padx=10, pady=12)
+
+        frame3.pack(expand="yes")
+
+    def Password_(self):
+        for widget in self.frame2.winfo_children():
+            widget.destroy()
+        frame = ctk.CTkFrame(self.frame2)
+        frame.pack(expand="yes")
+
+        ctk.CTkLabel(master=frame, text='Please enter your password').pack()
+        ctk.CTkEntry(master=frame, textvariable=self.password_entry, width=300).pack()
+        ctk.CTkLabel(master=frame, textvariable=self.Label1, width=5).pack()
+        self.password_entry.trace_add("write", self.Modify)
+
+
+    def Modify(self,*args):
+        self.Label1.set('')
+        if self.password_entry.get() != '':
+            if self.password_entry.get() == "123456789":
+                for widget in self.frame2.winfo_children():
+                    widget.destroy()
+                frame = ctk.CTkFrame(self.frame2)
+                frame.pack(expand="yes")
+
+                ctk.CTkLabel(master=frame, text='Name').grid(row=1, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Birthday').grid(row=2, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Gender').grid(row=3, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Contact number').grid(row=4, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Email').grid(row=5, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Password').grid(row=6, column=0, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, text='Re-enter Password').grid(row=7, column=0, padx=10, pady=12)
+
+                ctk.CTkEntry(master=frame, textvariable=self.name, width=300).grid(
+                    row=1, column=1, columnspan=3, padx=10, pady=12)
+
+                ctk.CTkComboBox(master=frame, variable=self.birthday_year, values=self.year, width=80).grid(
+                    row=2, column=1, padx=10, pady=12)
+                ctk.CTkComboBox(master=frame, variable=self.birthday_month, values=self.month, width=80).grid(
+                    row=2, column=2, padx=10, pady=12)
+                self._day = ctk.CTkComboBox(master=frame, variable=self.birthday_day, width=80)
+                self._day.grid(row=2, column=3, padx=10, pady=12)
+                self.birthday_month.trace_add("write", self.show_day)
+                self.birthday_year.trace_add("write", self.show_day)
+
+                ctk.CTkRadioButton(master=frame, text="male", variable=self.gender, value=True).grid(
+                    row=3, column=2, padx=10, pady=12)
+                ctk.CTkRadioButton(master=frame, text="female", variable=self.gender, value=True).grid(
+                    row=3, column=3, padx=10, pady=12)
+
+                ctk.CTkEntry(master=frame, textvariable=self.contact_number, width=300).grid(
+                    row=4, column=1, columnspan=3, padx=10, pady=12)
+                ctk.CTkEntry(master=frame, textvariable=self.email, width=300).grid(
+                    row=5, column=1, columnspan=3, padx=10, pady=12)
+                ctk.CTkEntry(master=frame, textvariable=self.password, show='*', width=300).grid(
+                    row=6, column=1, columnspan=3, padx=10, pady=12)
+                ctk.CTkEntry(master=frame, textvariable=self.password_, show='*', width=300).grid(
+                    row=7, column=1, columnspan=3, padx=10, pady=12)
+                ctk.CTkLabel(master=frame, textvariable=self.Label2, width=5).grid(
+                    row=7, column=4, padx=10, pady=12)
+                self.password.trace_add("write", self.Password_confirmation)
+                self.password_.trace_add("write", self.Password_confirmation)
+
+                ctk.CTkButton(master=frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
+                    row=8, column=1, padx=10, pady=12)
+                ctk.CTkButton(master=frame, text="Back", width=5, command=lambda: self.Personal_Information()).grid(
+                    row=8, column=3, padx=10, pady=12)
+            else:
+                self.Label1.set('The password is wrong')
+
+
+    def show_day(self, *args):
+        self._day.set('')
+        day = []
+        if self.birthday_month.get() != '' and self.birthday_year.get() != '':
+            month = int(self.birthday_month.get())
+            if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
+                for i in range(31):
+                    day.append(str(1 + i))
+            elif month != 2:
+                for i in range(30):
+                    day.append(str(1 + i))
+            else:
+                year = int(self.birthday_year.get())
+                if year % 4 == 0 and year % 100 != 0 or year % 400 == 0:
+                    for i in range(29):
+                        day.append(str(1 + i))
+                else:
+                    for i in range(28):
+                        day.append(str(1 + i))
+            self._day.configure(values=day)
+
+    def Password_confirmation(self, *args):
+        self.Label2.set('')
+        if self.password.get() != '' and self.password_.get() != '':
+            if self.password.get() == self.password_.get():
+                self.Label2.set('Pass')
+            else:
+                self.Label2.set('Fail')
+
+class Administrator_Frame(Base_Frame):
+    def __init__(self, master, id):
+        super().__init__(master)
+
+        self.id = id
+        self.frame1 = ctk.CTkFrame(self.tk_frame)
+        self.frame2 = ctk.CTkFrame(self.tk_frame)
+        Info = sql_request.get_personal_info(self.id, 'doctor')
+
+        ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="Administrator").pack(padx=10, pady=12)
+        ctk.CTkButton(master=self.frame1, text="Doctor", width=5,
+                      command=lambda: self.Doctor()).pack(padx=10, pady=12)
+        ctk.CTkButton(master=self.frame1, text="Nurse", width=5,
+                      command=lambda: self.Nurse()).pack(padx=10, pady=12)
+
+        self.frame1.pack(side='left', padx=10, fill='y')
+        self.frame2.pack(side='left', padx=10, fill='both', expand="yes")
+
+    def Doctor(self):
+        for widget in self.frame2.winfo_children():
+            widget.destroy()
+
+        ID = ctk.StringVar()
+        ID_ = ctk.StringVar()
+        Name = ctk.StringVar()
+        Department = ctk.StringVar()
+        Department_ = ctk.StringVar()
+        Status = ctk.IntVar()
+        Status_ = ctk.IntVar()
+        frame = ctk.CTkFrame(self.frame2)
+        frame.pack(expand="yes")
+
+        ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text="Department").grid(row=0, column=2, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text="Status").grid(row=0, column=3, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=ID, width=100).grid(
+            row=1, column=0, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=ID_, width=100).grid(
+            row=2, column=0, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Name, width=100).grid(
+            row=1, column=1, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Department, width=100).grid(
+            row=1, column=2, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Department_, width=100).grid(
+            row=2, column=2, padx=10, pady=12)
+        ctk.CTkCheckBox(master=frame, text="P", variable=Status, width=100).grid(
+            row=1, column=3, padx=10, pady=12 )
+        ctk.CTkCheckBox(master=frame, text="A", variable=Status_, width=100).grid(
+            row=2, column=3, padx=10, pady=12)
+        ctk.CTkButton(master=frame, text="Search", width=5, command=lambda: Search()).grid(
+            row=1, column=4, padx=10, pady=12)
+        ctk.CTkButton(master=frame, text='Modify', width=5, command=lambda: Modify()).grid(
+            row=2, column=4, padx=10, pady=12)
+
+        tree = ttk.Treeview(frame,show="headings",height=20)
+        tree["columns"] = ("id", "email", "name", "gender", "contact number", "department", "status")
+        tree.column("id", width=100, anchor='center')
+        tree.column("email", width=100, anchor='center')
+        tree.column("name", width=100, anchor='center')
+        tree.column("gender", width=100, anchor='center')
+        tree.column("contact number", width=100, anchor='center')
+        tree.column("department", width=100, anchor='center')
+        tree.column("status", width=100, anchor='center')
+        tree.heading("id", text="ID")
+        tree.heading("email", text="Email")
+        tree.heading("name", text="Name")
+        tree.heading("gender", text="Gender")
+        tree.heading("department", text="Department")
+        tree.heading("contact number", text="Contact Number")
+        tree.heading("status", text="Status")
+        tree.grid(row=3, column=0, columnspan=7, rowspan=5, padx=10, pady=12)
+
+
+        def Search():
+            pass
+
+        def Modify():
+            pass
+
+
+    def Nurse(self):
+        for widget in self.frame2.winfo_children():
+            widget.destroy()
+
+        ID = ctk.StringVar()
+        ID_ = ctk.StringVar()
+        Name = ctk.StringVar()
+        Department = ctk.StringVar()
+        Department_ = ctk.StringVar()
+        Status = ctk.IntVar()
+        Status_ = ctk.IntVar()
+        isMaster = ctk.IntVar()
+        isMaster_ = ctk.IntVar()
+        frame = ctk.CTkFrame(self.frame2)
+        frame.pack(expand="yes")
+
+        ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text="Department").grid(row=0, column=2, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text="Status").grid(row=0, column=3, padx=10, pady=12)
+        ctk.CTkLabel(master=frame, text="isMaster").grid(row=0, column=4, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=ID, width=100).grid(
+            row=1, column=0, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=ID_, width=100).grid(
+            row=2, column=0, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Name, width=100).grid(
+            row=1, column=1, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Department, width=100).grid(
+            row=1, column=2, padx=10, pady=12)
+        ctk.CTkEntry(master=frame, textvariable=Department_, width=100).grid(
+            row=2, column=2, padx=10, pady=12)
+        ctk.CTkCheckBox(master=frame, text="P" ,variable=Status, width=100).grid(
+            row=1, column=3, padx=10, pady=12)
+        ctk.CTkCheckBox(master=frame, text="A", variable=Status_, width=100).grid(
+            row=2, column=3, padx=10, pady=12)
+        ctk.CTkCheckBox(master=frame, text="Yes", variable=isMaster, width=100).grid(
+            row=1, column=4, padx=10, pady=12)
+        ctk.CTkCheckBox(master=frame, text="Yes", variable=isMaster_, width=100).grid(
+            row=2, column=4, padx=10, pady=12)
+        ctk.CTkButton(master=frame, text="Search", width=5, command=lambda: Search()).grid(
+            row=1, column=5, padx=10, pady=12)
+        ctk.CTkButton(master=frame, text='Modify', width=5, command=lambda: Modify()).grid(
+            row=2, column=5, padx=10, pady=12)
+
+        tree = ttk.Treeview(frame, show="headings", height=20)
+        tree["columns"] = ("id", "email", "name", "gender", "contact number", "department", "status", "isMaster")
+        tree.column("id", width=100, anchor='center')
+        tree.column("email", width=100, anchor='center')
+        tree.column("name", width=100, anchor='center')
+        tree.column("gender", width=100, anchor='center')
+        tree.column("contact number", width=150, anchor='center')
+        tree.column("department", width=100, anchor='center')
+        tree.column("status", width=100, anchor='center')
+        tree.column("isMaster", width=100, anchor='center')
+        tree.heading("id", text="ID")
+        tree.heading("email", text="Email")
+        tree.heading("name", text="Name")
+        tree.heading("gender", text="Gender")
+        tree.heading("department", text="Department")
+        tree.heading("contact number", text="Contact Number")
+        tree.heading("status", text="Status")
+        tree.heading("isMaster", text="isMaster")
+        tree.grid(row=3, column=0, columnspan=8, rowspan=5, padx=10, pady=12)
+
+        def Search():
+            pass
+
+        def Modify():
+            pass
+
+class Master_Frame(Base_Frame):
     def __init__(self, master, id):
         super().__init__(master)
 

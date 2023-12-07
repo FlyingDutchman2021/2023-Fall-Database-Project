@@ -204,9 +204,9 @@ def get_personal_info(_id: int, _identity: str):
 def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_date: str,
                         _blood_type: str, _contact_number: str, _note: str):
     if not db.isEmail(_email):
-        return 'error: Email Format'
+        return 'error: Format'
     if not db.isContactNumber(_contact_number):
-        return 'error: Contact Number Format'
+        return 'error: Format'
     _email = db.purify(_email)
     _name = db.purify(_name)
     _contact_number = db.purify(_contact_number)
@@ -218,16 +218,47 @@ def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_dat
 
     # Add Info
     status, result = db.update_patient_info(_id, _email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
-    if status == 'Success':
-        return status
-    else:
+    if not status == 'Success':
         return 'SQL Error'
+    return 'Success'
 
 
-def update_doctor_info():
-    pass
+def update_doctor_info(_id: int, email: str, name: str, sex: str, contact_number: str):
+    # Check entry inputs
+    if not db.isEmail(email):
+        return 'error: Format'
+    if not db.isContactNumber(contact_number):
+        return 'error: Format'
+    # Purify them
+    email = db.purify(email)
+    name = db.purify(name)
+    contact_number = int(contact_number)
+
+    # Update Info
+    status1, result_list1 = db.update_doctor_info(_id, email, name, sex, contact_number)
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status2, result_list2 = db.find_latest_entry('doctor')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    _id = result_list2[0][0]
+    status3, result_list3 = db.add_password(_id, 'D', db.hash_new_password(password))
+    if not status3 == 'Success':
+        return 'SQL Error'
+    return 'Success'
+
 
 
 def update_nurse_info():
     pass
 
+
+# update doctor_info_status and etc
+# update nurse_info_status and etc
+# update password
+# search doctor
+# search nurse
+# search patient
+# add test/prescription
+# find test/prescription
+# delete 

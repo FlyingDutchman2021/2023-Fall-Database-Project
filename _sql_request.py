@@ -142,10 +142,13 @@ def find_latest_entry(table: str):
     return _sql_request(sql)
 
 
-
-
-
-
+# Password
+#
+# Find password
+# Add (including hashing)
+# Update
+# Delete
+#
 # Find password according to id and identity
 #
 # _id: 12 digits integer,
@@ -178,11 +181,11 @@ def delete_password(_id: int, _identity: str):
     return _sql_request(sql)
 
 
-
-
-
-
-
+# Universal for Patient, Doctor and Nurse
+#
+# Show information (with start and range)
+# Find information (with search key options: id or contact or email)
+#
 def show_info(_target_table: str, start: int, number_of_page: int):
     sql = "SELECT * FROM %s LIMIT %d OFFSET %d" % (_target_table, number_of_page, start - 1)
     return _sql_request(sql)
@@ -226,6 +229,12 @@ def find_info(_target_table, _info: str, _search_by: str, _search_key):
     return _sql_request(sql)
 
 
+# Patient
+#
+# Add
+# Edit (personal) [All]
+# Delete
+
 def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: int,
                      _blood_type: str, _contact_number: int, _note: str = ''):
     sql = ("INSERT INTO patient_info (email, name, sex, birth_date, blood_type, contact_number, note) VALUES ('%s', "
@@ -248,6 +257,14 @@ def delete_patient_info(_id: int):
     return _sql_request(sql)
 
 
+# Doctor
+#
+# Show pending (with start and range)
+# Add
+# Edit (personal)
+# Edit (admin)
+# Delete
+
 def show_pending_doctor(start: int, number_of_page: int):
     sql = "SELECT * FROM doctor_info WHERE status='P' LIMIT %d OFFSET %d" % (number_of_page, start - 1)
     return _sql_request(sql)
@@ -266,8 +283,8 @@ def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_nu
     return _sql_request(sql)
 
 
-def update_doctor_status(_id: int, status):
-    sql = "UPDATE doctor_info SET status='%s' WHERE id=%d" % (status, _id)
+def update_doctor_status(_id: int, department: str, status: str):
+    sql = "UPDATE doctor_info SET department='%s', status='%s' WHERE id=%d" % (department, status, _id)
     return _sql_request(sql)
 
 
@@ -275,6 +292,15 @@ def delete_doctor_info(_id: int):
     sql = "DELETE FROM doctor_info WHERE id = %d" % _id
     return _sql_request(sql)
 
+
+# Nurse
+#
+# Show pending (with start and range)
+# Add
+# Edit (personal)
+# Edit (Admin)
+# Delete
+#
 
 def show_pending_nurse(start: int, number_of_page: int):
     sql = "SELECT * FROM nurse_info WHERE status='P' LIMIT %d OFFSET %d" % (number_of_page, start - 1)
@@ -294,14 +320,10 @@ def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number:
     return _sql_request(sql)
 
 
-def update_nurse_status(_id: int, status: str):
-    sql = "UPDATE nurse_info SET status = '%s' WHERE id = %d" % (status, _id)
-    return _sql_request(sql)
-
-
-def update_nurse_isMaster(_id, isMaster: bool):
-    value = 1 if isMaster else 0
-    sql = "UPDATE nurse_info SET isMaster = %d WHERE id = %d" % (value, _id)
+def update_nurse_status(_id: int, department: str, status: str, isMaster: bool):
+    isMaster = 1 if isMaster else 0
+    sql = ("UPDATE nurse_info SET department='%s', status = '%s', isMaster=%d WHERE id = %d"
+           % (department, status, isMaster, _id))
     return _sql_request(sql)
 
 
