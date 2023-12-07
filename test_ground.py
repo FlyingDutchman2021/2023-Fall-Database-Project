@@ -22,7 +22,8 @@ class MainWindow:
 
 
 
-        self.frame1 = frame.Doctor_Frame(self.window, 100000000001)
+
+        self.frame1 = frame.Identity_Frame(self.window)
 
 
 
