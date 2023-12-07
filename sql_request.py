@@ -55,7 +55,7 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
 # Return <status>, possible status:
 # error: Email Format, error: Contact Number Format, Success, SQL Error
 def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
-                     _blood_type: str, _contact_number: str, _note: str):
+                     _blood_type: str, _contact_number: str, _note: str, password: str):
     # Check email, name, contact_number, note
     # Purify Everything
     if not db.isEmail(_email):
@@ -71,9 +71,14 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
     _birth_date = int(_birth_date)
     _contact_number = int(_contact_number)
 
+    # Get id
+    status, result = db.find_latest_entry('patient')
+    _id = result[0][0]
+
     # Add Info
-    status, result_list = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
-    if status == 'Success':
+    status1, result_list1 = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    status2, result_list2 = db.add_password(_id, 'P', db.hash_new_password(password))
+    if status1 == 'Success' and status2 == 'Success':
         return 'Success'
     else:
         return 'SQL Error'
