@@ -65,15 +65,15 @@ def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
 
 
 # Return <status>, possible status:
-# error: Email Format, error: Contact Number Format, Success, SQL Error
+# error: Format, Success, SQL Error
 def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
                      _blood_type: str, _contact_number: str, _note: str, password: str):
     # Check email, name, contact_number, note
     # Purify Everything
     if not db.isEmail(_email):
-        return 'error: Email Format'
+        return 'error: Format'
     if not db.isContactNumber(_contact_number):
-        return 'error: Contact Number Format'
+        return 'error: Format'
     _email = db.purify(_email)
     _name = db.purify(_name)
     _contact_number = db.purify(_contact_number)
@@ -84,16 +84,22 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
     _contact_number = int(_contact_number)
 
     # Get id
-    status, result = db.find_latest_entry('patient')
-    _id = result[0][0]
+
 
     # Add Info
     status1, result_list1 = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
-    status2, result_list2 = db.add_password(_id, 'P', db.hash_new_password(password))
-    if status1 == 'Success' and status2 == 'Success':
-        return 'Success'
-    else:
+    if not status1 == 'Success':
         return 'SQL Error'
+    status2, result_list2 = db.find_latest_entry('patient')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    _id = result_list2[0][0]
+    status3, result_list3 = db.add_password(_id, 'P', db.hash_new_password(password))
+
+    if not status3 == 'Success':
+        return 'SQL Error'
+
+    return 'Success'
 
 
 # Return <status>
@@ -108,14 +114,41 @@ def delete_patient_account(_id: int):
         return 'SQL Error'
 
 
-
-
-def register_doctor():
+def register_doctor(email: str, name: str, sex: str, contact_number: str, password: str):
     pass
+    # Check entry inputs
+    if not db.isEmail(email):
+        return 'error: Format'
+    if not db.isContactNumber(contact_number):
+        return 'error: Format'
+    # Purify them
+    email = db.purify(email)
+    name = db.purify(name)
+    contact_number = int(contact_number)
+
+    # Add Info
+    status1, result_list1 = db.add_doctor_info(email, name, sex, contact_number, '', 'P')
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status2, result_list2 = db.find_latest_entry('doctor')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    _id = result_list2[0][0]
+    status3, result_list3 = db.add_password(_id, 'D', db.hash_new_password(password))
+    if not status3 == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
 
-def delete_doctor_account():
-    pass
+
+def delete_doctor_account(_id: int):
+    status1, result1 = db.delete_doctor_info(_id)
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status2, result2 = db.delete_password(_id, 'D')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
 
 def register_nurse():
