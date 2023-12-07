@@ -195,18 +195,15 @@ def get_personal_info(_id: int, _identity: str):
 # Return <status>
 # possible status:
 # error: Email Format, error: Contact Number Format, Success, SQL Error
-def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_date: str,
-                        _blood_type: str, _contact_number: str, _note: str):
+def update_patient_general(_id: int, _email: str, _name: str, _sex: str, _birth_date: str,
+                           _blood_type: str, _contact_number: str, _note: str):
     if not db.isEmail(_email):
         return 'error: Format'
     if not db.isContactNumber(_contact_number):
         return 'error: Format'
     _email = db.purify(_email)
     _name = db.purify(_name)
-    _contact_number = db.purify(_contact_number)
     _note = db.purify(_note)
-
-    # Turn str to int
     _birth_date = int(_birth_date)
     _contact_number = int(_contact_number)
 
@@ -217,7 +214,7 @@ def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_dat
     return 'Success'
 
 
-def update_doctor_info(_id: int, email: str, name: str, sex: str, contact_number: str):
+def update_doctor_general(_id: int, email: str, name: str, sex: str, contact_number: str):
     # Check entry inputs
     if not db.isEmail(email):
         return 'error: Format'
