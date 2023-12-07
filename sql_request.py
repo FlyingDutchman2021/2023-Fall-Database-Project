@@ -228,16 +228,7 @@ def update_doctor_general(_id: int, email: str, name: str, sex: str, contact_num
 
     # Update Info
     status1, result_list1 = db.update_doctor_info(_id, email, name, sex, contact_number)
-    #
     if not status1 == 'Success':
-        return 'SQL Error'
-    status2, result_list2 = db.find_latest_entry('doctor')
-    if not status2 == 'Success':
-        return 'SQL Error'
-
-    _id = result_list2[0][0]
-    status3, result_list3 = db.add_password(_id, 'D', db.hash_new_password(password))
-    if not status3 == 'Success':
         return 'SQL Error'
     return 'Success'
 
@@ -307,7 +298,7 @@ def update_password(_id: int, _identity: str, old_password: str, new_password: s
     status1, result1 = db.find_password(_id, identity)
     if status1 != 'Success':
         return 'SQL Error'
-    stored_password = rtn_find_result[0][0]
+    stored_password = result1[0][0]
     if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
         return 'Wrong Password'
 
@@ -328,6 +319,8 @@ def update_password(_id: int, _identity: str, old_password: str, new_password: s
 # find test/prescription
 # delete
 
+
+# Purify all db. operation
 
 def bed_assign(room: int, bed: int, patient_id: int):
     # 检查床位是否已被占用

@@ -277,9 +277,9 @@ def add_doctor_info(_email: str, _name: str, _sex: str, _contact_number: int, _d
     return _sql_request(sql)
 
 
-def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_number: int, _department: str):
-    sql = ("UPDATE doctor_info SET email='%s', name='%s', sex='%s', contact_number=%d, department='%s' WHERE id=%d"
-           % (_email, _name, _sex, _contact_number, _department, _id))
+def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_number: int):
+    sql = ("UPDATE doctor_info SET email='%s', name='%s', sex='%s', contact_number=%d WHERE id=%d"
+           % (_email, _name, _sex, _contact_number, _id))
     return _sql_request(sql)
 
 
@@ -332,13 +332,13 @@ def delete_nurse_info(_id):
     return _sql_request(sql)
 
 
-
-
 # 病房的操作
 # 床位是否空闲
 def check_bed_availability(room: int, bed: int):
     sql = "SELECT * FROM bed_assignment WHERE room = %d AND bed = %d AND patient_id IS NULL" % (room, bed)
     return _sql_request(sql)
+
+
 # 将病人安置到指定床位
 def assign_bed_to_patient(room: int, bed: int, patient_id: int):
     sql = "UPDATE bed_assignment SET patient_id = %d WHERE room = %d AND bed = %d" % (patient_id, room, bed)
