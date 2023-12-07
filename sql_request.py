@@ -14,6 +14,8 @@ def isID(entry: str):
     return db.isID(entry)
 
 
+# Universal Login for Patient, Doctor and Nurse (you have to indicate the identity)
+#
 # Return <status>, possible status:
 # SQL Error, User not found, Invalid username, Success, Wrong Password
 def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
@@ -76,15 +78,10 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
         return 'error: Format'
     _email = db.purify(_email)
     _name = db.purify(_name)
-    _contact_number = db.purify(_contact_number)
     _note = db.purify(_note)
-
     # Turn str to int
     _birth_date = int(_birth_date)
     _contact_number = int(_contact_number)
-
-    # Get id
-
 
     # Add Info
     status1, result_list1 = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
@@ -95,10 +92,8 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
         return 'SQL Error'
     _id = result_list2[0][0]
     status3, result_list3 = db.add_password(_id, 'P', db.hash_new_password(password))
-
     if not status3 == 'Success':
         return 'SQL Error'
-
     return 'Success'
 
 
@@ -192,10 +187,9 @@ def delete_nurse_account(_id: int):
 # Success, SQL Error
 def get_personal_info(_id: int, _identity: str):
     status, result = db.find_info(_identity, 'all', 'id', _id)
-    if status == 'Success':
-        return status, result
-    else:
+    if not status == 'Success':
         return 'SQL Error', []
+    return 'Success', result
 
 
 # Return <status>
@@ -261,4 +255,7 @@ def update_nurse_info():
 # search patient
 # add test/prescription
 # find test/prescription
-# delete 
+# delete
+
+
+# Purify all db. operation
