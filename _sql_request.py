@@ -121,8 +121,11 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
             temp_cursor.close()
             return 'Success', temp_result
 
-    except sqlite3.Error:
-        return sqlite3.Error, []
+    except sqlite3.Error as err:
+        err_msg = ' '.join(err.args)
+        if dev_mode_on:
+            print(err_msg)
+        return err_msg, []
 
 
 # Return <status>, <result_list>
