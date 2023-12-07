@@ -293,8 +293,93 @@ def update_nurse_admin(_id: int, department: str, status: str, isMaster: bool):
     return 'Success'
 
 
-# update doctor_info_status
-# universal search
+# Universal Search
+#
+#
+def universal_find_patient(search_key: str):
+    if search_key.isdigit():
+        # is digit action
+        search_key = search_key + '%'
+        sql = ("SELECT * FROM patient_info WHERE contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s'"
+               % (search_key, search_key, search_key))
+    else:
+        # is mixed text action
+        search_key = search_key + '%'
+        search_key_name = '%' + search_key + '%'
+        sql = ("SELECT * FROM patient_info WHERE name LIKE '%s' OR email LIKE '%s'"
+               % (search_key_name, search_key))
+    status, result = _sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
+
+# status: if you don't want to filter anything, leave it blank
+#         but if you want to filter the pending(P) or accepted(A) ones,
+#         enter 'P' or 'A'.
+def universal_find_doctor(search_key: str, status: str = ''):
+    if search_key.isdigit():
+        # is digit action
+        search_key = search_key + '%'
+        sql = ("SELECT * FROM doctor_info WHERE (contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s')"
+               % (search_key, search_key, search_key))
+    else:
+        # is mixed text action
+        search_key = search_key + '%'
+        search_key_name = '%' + search_key + '%'
+        sql = ("SELECT * FROM doctor_info WHERE (name LIKE '%s' OR email LIKE '%s' OR department LIKE '%s')"
+               % (search_key_name, search_key, search_key))
+
+    if status == '':
+        pass
+    elif status == 'P':
+        sql = sql + " AND status='P'"
+    elif status == 'A':
+        sql = sql + " AND status='A'"
+    else:
+        print('status value illegal!!!')
+    status, result = _sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
+
+# status: if you don't want to filter anything, leave it blank
+#         but if you want to filter the pending(P) or accepted(A) ones,
+#         enter 'P' or 'A'.
+#
+# isMaster: if you want to filter the Master nurse, turn it to True,
+#           otherwise leave it there, don't touch it, it has default value.
+def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = False):
+    if search_key.isdigit():
+        # is digit action
+        search_key = search_key + '%'
+        sql = ("SELECT * FROM nurse_info WHERE (contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s')"
+               % (search_key, search_key, search_key))
+    else:
+        # is mixed text action
+        search_key = search_key + '%'
+        search_key_name = '%' + search_key + '%'
+        sql = ("SELECT * FROM nurse_info WHERE (name LIKE '%s' OR email LIKE '%s' OR department LIKE '%s')"
+               % (search_key_name, search_key, search_key))
+
+    if status == '':
+        pass
+    elif status == 'P':
+        sql = sql + " AND status='P'"
+    elif status == 'A':
+        sql = sql + " AND status='A'"
+    else:
+        print('status value illegal!!!')
+
+    if isMaster is True:
+        sql = sql + " AND isMaster=1"
+
+    status, result = _sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
 
 # add test/prescription
 # find test/prescription
@@ -320,7 +405,7 @@ def bed_assign(room: int, bed: int, patient_id: int):
     # 如果结果为空列表，表示床位可用
     if len(result) == 0:
         # 分配床位给病人
-        status, assign_result = assign_bed_to_patient(room, bed, patient_id)
+        status, assign_result = db.assign_bed_to_patient(room, bed, patient_id)
         if status != 'Success':
             return 'SQL Error'
         return 'Success'

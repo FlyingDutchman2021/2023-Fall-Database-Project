@@ -103,6 +103,18 @@ def isID(entry: str) -> bool:
     return False
 
 
+def _table_translate(table_kind: str) -> str:
+    if table_kind == 'patient':
+        return 'patient_info'
+    elif table_kind == 'doctor':
+        return 'doctor_info'
+    elif table_kind == 'nurse':
+        return 'nurse_info'
+    else:
+        print('table_translate_error')
+        return ''
+
+
 # Base sql request framework
 # Return <status>, <result_list>
 # <status>:
@@ -196,18 +208,9 @@ def show_info(_target_table: str, start: int, number_of_page: int):
 # _search_by: 'id' or 'contact' or 'email'
 # _search_key: just like it says! :)
 def find_info(_target_table, _info: str, _search_by: str, _search_key):
-    table: str = ''
+    table: str = _table_translate(_target_table)
     info: str = ''
     search_sentence: str = ''
-
-    if _target_table == 'patient':
-        table = 'patient_info'
-    elif _target_table == 'doctor':
-        table = 'doctor_info'
-    elif _target_table == 'nurse':
-        table = 'nurse_info'
-    else:
-        print('_find_info_target_table_error')
 
     if _info == 'all':
         info = '*'
