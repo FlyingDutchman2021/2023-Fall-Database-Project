@@ -343,3 +343,16 @@ def check_bed_availability(room: int, bed: int):
 def assign_bed_to_patient(room: int, bed: int, patient_id: int):
     sql = "UPDATE bed_assignment SET patient_id = %d WHERE room = %d AND bed = %d" % (patient_id, room, bed)
     return _sql_request(sql)
+
+# 处方的操作
+def add_new_prescription(patient_id: int, doctor_id: int, date_time_created: int, content: str):
+    sql = "INSERT INTO prescriptions (patient_id, doctor_id, date_time_created, content) VALUES (?, ?, ?, ?)"
+    try:
+        with sqlite3.connect('your_database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, [patient_id, doctor_id, date_time_created, content])  # 另一种净化方式
+            prescription_id = cursor.lastrowid  # 获取最新插入的处方ID
+            conn.commit()
+            return 'Success', prescription_id
+    except sqlite3.Error as e:
+        return str(e), []

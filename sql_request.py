@@ -1,6 +1,7 @@
 import _sql_request as db
 import bcrypt as bc
-
+import datetime
+import sqlite3
 
 def isEmail(entry: str):
     return db.isEmail(entry)
@@ -343,3 +344,17 @@ def bed_assign(room: int, bed: int, patient_id: int):
         return 'Success'
     else:
         return 'Bed already occupied'
+
+# 处方更新
+def prescription_update(patient_id: int, doctor_id: int, content: str):
+    # 获取当前系统时间并格式化为年月日时分的格式
+    date_time_created = datetime.datetime.now().strftime("%Y%m%d%H%M")
+    date_time_created = int(date_time_created)
+
+    # 插入新的处方记录，并获取该记录的ID
+    status, prescription_id = add_new_prescription(patient_id, doctor_id, date_time_created, content)
+    if status != 'Success':
+        return 'SQL Error'
+
+    # 返回成功状态和处方ID
+    return 'Success'
