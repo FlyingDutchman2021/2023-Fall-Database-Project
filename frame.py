@@ -311,10 +311,6 @@ class Sign_up_Doctor_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
         self.name = ctk.StringVar()
-        self.birthday = ctk.StringVar()
-        self.birthday_year = ctk.StringVar()
-        self.birthday_month = ctk.StringVar()
-        self.birthday_day = ctk.StringVar()
         self.gender = ctk.StringVar()
         self.contact_number = ctk.StringVar()
         self.email = ctk.StringVar()
@@ -333,47 +329,37 @@ class Sign_up_Doctor_Frame(Base_Frame):
             row=0, column=0, columnspan=4, padx=10, pady=12)
 
         ctk.CTkLabel(master=self.frame, text='Name').grid(row=1, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Birthday').grid(row=2, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Gender').grid(row=3, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Contact number').grid(row=4, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Email').grid(row=5, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Password').grid(row=6, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Re-enter Password').grid(row=7, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Gender').grid(row=2, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Contact number').grid(row=3, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Email').grid(row=4, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Password').grid(row=5, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Re-enter Password').grid(row=6, column=0, padx=10, pady=12)
 
         ctk.CTkEntry(master=self.frame, textvariable=self.name, width=300).grid(
             row=1, column=1, columnspan=3, padx=10, pady=12)
 
-        ctk.CTkComboBox(master=self.frame, variable=self.birthday_year, values=self.year, width=80).grid(
-            row=2, column=1, padx=10, pady=12)
-        ctk.CTkComboBox(master=self.frame, variable=self.birthday_month, values=self.month, width=80).grid(
+        ctk.CTkRadioButton(master=self.frame, text="Male", variable=self.gender, value="Male").grid(
             row=2, column=2, padx=10, pady=12)
-        self._day = ctk.CTkComboBox(master=self.frame, variable=self.birthday_day, width=80)
-        self._day.grid(row=2, column=3, padx=10, pady=12)
-        self.birthday_month.trace_add("write", self.show_day)
-        self.birthday_year.trace_add("write", self.show_day)
-
-        ctk.CTkRadioButton(master=self.frame, text="male", variable=self.gender, value=True).grid(
-            row=3, column=2, padx=10, pady=12)
-        ctk.CTkRadioButton(master=self.frame, text="female", variable=self.gender, value=True).grid(
-            row=3, column=3, padx=10, pady=12)
+        ctk.CTkRadioButton(master=self.frame, text="Female", variable=self.gender, value="Female").grid(
+            row=2, column=3, padx=10, pady=12)
 
         ctk.CTkEntry(master=self.frame, textvariable=self.contact_number, width=300).grid(
-            row=4, column=1, columnspan=3, padx=10, pady=12)
+            row=3, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.email, width=300).grid(
-            row=5, column=1, columnspan=3, padx=10, pady=12)
+            row=4, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=300).grid(
-            row=6, column=1, columnspan=3, padx=10, pady=12)
+            row=5, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.password_, show='*', width=300).grid(
-            row=7, column=1, columnspan=3, padx=10, pady=12)
+            row=6, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkLabel(master=self.frame, textvariable=self.Label, width=20).grid(
-            row=7, column=4, padx=10, pady=12)
+            row=6, column=4, padx=10, pady=12)
         self.password.trace_add("write", self.Password_confirmation)
         self.password_.trace_add("write", self.Password_confirmation)
 
-        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
-            row=8, column=1, padx=10, pady=12)
+        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(
+            row=7, column=1, padx=10, pady=12)
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("Patient")).grid(
-            row=8, column=3, padx=10, pady=12)
+            row=7, column=3, padx=10, pady=12)
         self.frame.pack()
 
     def Password_confirmation(self, *args):
@@ -405,15 +391,55 @@ class Sign_up_Doctor_Frame(Base_Frame):
                         day.append(str(1 + i))
             self._day.configure(values = day)
 
+    # 获得输入信息，注册，返回注册结果
+    def register(self):
+        # 输入验证
+        if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(), self.gender.get()]):
+            messagebox.showerror("Error", "Please fill in all fields")
+            return
+
+        if not self.validate_contact_number(self.contact_number.get()):
+            messagebox.showerror("Error", "Invalid contact number format")
+            return
+
+        if not self.validate_email(self.email.get()):
+            messagebox.showerror("Error", "Invalid email format")
+            return
+
+        if self.password.get() != self.password_.get():
+            messagebox.showerror("Error", "Passwords do not match")
+            return
+
+        # 调用后端注册函数
+        result = sql_request.register_doctor(
+            self.email.get(),
+            self.name.get(),
+            self.gender.get(),
+            self.contact_number.get(),
+            self.password.get()
+        )
+
+        if result == 'Success':
+            messagebox.showinfo("Success", "Registration successful")
+            self.switch_Log_In("Doctor")  # 假设有专门的医生登录界面
+        else:
+            messagebox.showerror("Error", result)
+
+    def validate_email(self, email):
+        # 电子邮件的基本验证正则表达式
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        return re.match(pattern, email) is not None
+
+    def validate_contact_number(self, contact_number):
+        # 检查是否为11位数字
+        return contact_number.isdigit() and len(contact_number) == 11
+
+
 
 class Sign_up_Nurse_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
         self.name = ctk.StringVar()
-        self.birthday = ctk.StringVar()
-        self.birthday_year = ctk.StringVar()
-        self.birthday_month = ctk.StringVar()
-        self.birthday_day = ctk.StringVar()
         self.gender = ctk.StringVar()
         self.contact_number = ctk.StringVar()
         self.email = ctk.StringVar()
@@ -432,54 +458,42 @@ class Sign_up_Nurse_Frame(Base_Frame):
             row=0, column=0, columnspan=4, padx=10, pady=12)
 
         ctk.CTkLabel(master=self.frame, text='Name').grid(row=1, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Birthday').grid(row=2, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Gender').grid(row=3, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Contact number').grid(row=4, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Email').grid(row=5, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Password').grid(row=6, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Re-enter Password').grid(row=7, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Gender').grid(row=2, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Contact number').grid(row=3, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Email').grid(row=4, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Password').grid(row=5, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Re-enter Password').grid(row=6, column=0, padx=10, pady=12)
 
         ctk.CTkEntry(master=self.frame, textvariable=self.name, width=300).grid(
             row=1, column=1, columnspan=3, padx=10, pady=12)
 
-        ctk.CTkComboBox(master=self.frame, variable=self.birthday_year, values=self.year, width=80).grid(
-            row=2, column=1, padx=10, pady=12)
-        ctk.CTkComboBox(master=self.frame, variable=self.birthday_month, values=self.month, width=80).grid(
+        ctk.CTkRadioButton(master=self.frame, text="Male", variable=self.gender, value="Male").grid(
             row=2, column=2, padx=10, pady=12)
-        self._day = ctk.CTkComboBox(master=self.frame, variable=self.birthday_day, width=80)
-        self._day.grid(row=2, column=3, padx=10, pady=12)
-
-        self.birthday_month.trace_add("write", self.show_day)
-        self.birthday_year.trace_add("write", self.show_day)
-
-        ctk.CTkRadioButton(master=self.frame, text="male", variable=self.gender, value=True).grid(
-            row=3, column=2, padx=10, pady=12)
-        ctk.CTkRadioButton(master=self.frame, text="female", variable=self.gender, value=True).grid(
-            row=3, column=3, padx=10, pady=12)
+        ctk.CTkRadioButton(master=self.frame, text="Female", variable=self.gender, value="Female").grid(
+            row=2, column=3, padx=10, pady=12)
 
         ctk.CTkEntry(master=self.frame, textvariable=self.contact_number, width=300).grid(
-            row=4, column=1, columnspan=3, padx=10, pady=12)
+            row=3, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.email, width=300).grid(
-            row=5, column=1, columnspan=3, padx=10, pady=12)
+            row=4, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=300).grid(
-            row=6, column=1, columnspan=3, padx=10, pady=12)
+            row=5, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.password_, show='*', width=300).grid(
-            row=7, column=1, columnspan=3, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, textvariable=self.Label, width=5).grid(
-            row=7, column=4, padx=10, pady=12)
-
+            row=6, column=1, columnspan=3, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, textvariable=self.Label, width=20).grid(
+            row=6, column=4, padx=10, pady=12)
         self.password.trace_add("write", self.Password_confirmation)
         self.password_.trace_add("write", self.Password_confirmation)
 
-        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
-            row=8, column=1, padx=10, pady=12)
+        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(
+            row=7, column=1, padx=10, pady=12)
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("Patient")).grid(
-            row=8, column=3, padx=10, pady=12)
+            row=7, column=3, padx=10, pady=12)
         self.frame.pack()
 
     def Password_confirmation(self, *args):
         self.Label.set('')
-        if  self.password.get() != '' and self.password_.get() != '':
+        if self.password.get() != '' and self.password_.get() != '':
             if self.password.get() == self.password_.get():
                 self.Label.set('Pass')
             else:
@@ -505,6 +519,51 @@ class Sign_up_Nurse_Frame(Base_Frame):
                     for i in range(28):
                         day.append(str(1 + i))
             self._day.configure(values=day)
+
+        # 获得输入信息，注册，返回注册结果
+
+    def register(self):
+        # 输入验证
+        if not all(
+                [self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(), self.gender.get()]):
+            messagebox.showerror("Error", "Please fill in all fields")
+            return
+
+        if not self.validate_contact_number(self.contact_number.get()):
+            messagebox.showerror("Error", "Invalid contact number format")
+            return
+
+        if not self.validate_email(self.email.get()):
+            messagebox.showerror("Error", "Invalid email format")
+            return
+
+        if self.password.get() != self.password_.get():
+            messagebox.showerror("Error", "Passwords do not match")
+            return
+
+        # 调用后端注册函数
+        result = sql_request.register_nurse(
+            self.email.get(),
+            self.name.get(),
+            self.gender.get(),
+            self.contact_number.get(),
+            self.password.get()
+        )
+
+        if result == 'Success':
+            messagebox.showinfo("Success", "Registration successful")
+            self.switch_Log_In("Doctor")  # 假设有专门的医生登录界面
+        else:
+            messagebox.showerror("Error", result)
+
+    def validate_email(self, email):
+        # 电子邮件的基本验证正则表达式
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        return re.match(pattern, email) is not None
+
+    def validate_contact_number(self, contact_number):
+        # 检查是否为11位数字
+        return contact_number.isdigit() and len(contact_number) == 11
 
 
 class Patient_Frame(Base_Frame):
