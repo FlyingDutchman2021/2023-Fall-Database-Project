@@ -332,13 +332,13 @@ def delete_nurse_info(_id):
     return _sql_request(sql)
 
 
-
-
 # 病房的操作
 # 床位是否空闲
 def check_bed_availability(room: int, bed: int):
     sql = "SELECT * FROM bed_assignment WHERE room = %d AND bed = %d AND patient_id IS NULL" % (room, bed)
     return _sql_request(sql)
+
+
 # 将病人安置到指定床位
 def assign_bed_to_patient(room: int, bed: int, patient_id: int):
     sql = "UPDATE bed_assignment SET patient_id = %d WHERE room = %d AND bed = %d" % (patient_id, room, bed)
