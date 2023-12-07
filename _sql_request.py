@@ -125,6 +125,20 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
         return sqlite3.Error, []
 
 
+# Return <status>, <result_list>
+def find_latest_entry(table: str):
+    if table == 'patient':
+        table = 'patient_info'
+    elif table == 'doctor':
+        table = 'doctor_info'
+    elif table == 'nurse':
+        table = 'nurse_info'
+    else:
+        return 'No such table', []
+    sql = "SELECT seq from sqlite_sequence WHERE name = '%s'" % table
+    return _sql_request(sql)
+
+
 # Find password according to id and identity
 #
 # _id: 12 digits integer,
@@ -134,7 +148,7 @@ def find_password(_id: int, _identity: str):
     return _sql_request(sql)
 
 
-def _hash_new_password(_new_password: str) -> str:
+def hash_new_password(_new_password: str) -> str:
     pd = bytes(_new_password, 'utf-8')
     salt = bc.gensalt(config.salt_round)
     hpd = bc.hashpw(pd, salt)
