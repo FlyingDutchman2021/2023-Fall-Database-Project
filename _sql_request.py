@@ -277,9 +277,9 @@ def add_doctor_info(_email: str, _name: str, _sex: str, _contact_number: int, _d
     return _sql_request(sql)
 
 
-def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_number: int, _department: str):
-    sql = ("UPDATE doctor_info SET email='%s', name='%s', sex='%s', contact_number=%d, department='%s' WHERE id=%d"
-           % (_email, _name, _sex, _contact_number, _department, _id))
+def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_number: int):
+    sql = ("UPDATE doctor_info SET email='%s', name='%s', sex='%s', contact_number=%d WHERE id=%d"
+           % (_email, _name, _sex, _contact_number, _id))
     return _sql_request(sql)
 
 

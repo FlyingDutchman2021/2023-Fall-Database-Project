@@ -229,13 +229,6 @@ def update_doctor_general(_id: int, email: str, name: str, sex: str, contact_num
     status1, result_list1 = db.update_doctor_info(_id, email, name, sex, contact_number)
     if not status1 == 'Success':
         return 'SQL Error'
-    status2, result_list2 = db.find_latest_entry('doctor')
-    if not status2 == 'Success':
-        return 'SQL Error'
-    _id = result_list2[0][0]
-    status3, result_list3 = db.add_password(_id, 'D', db.hash_new_password(password))
-    if not status3 == 'Success':
-        return 'SQL Error'
     return 'Success'
 
 
