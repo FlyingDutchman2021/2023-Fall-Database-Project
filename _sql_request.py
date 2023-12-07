@@ -121,8 +121,11 @@ def _sql_request(SQL: str, db: str = 'hospital_system.db', dev_mode_on=True):
             temp_cursor.close()
             return 'Success', temp_result
 
-    except sqlite3.Error:
-        return sqlite3.Error, []
+    except sqlite3.Error as err:
+        err_msg = ' '.join(err.args)
+        if dev_mode_on:
+            print(err_msg)
+        return err_msg, []
 
 
 # Return <status>, <result_list>
@@ -137,7 +140,6 @@ def find_latest_entry(table: str):
         return 'No such table', []
     sql = "SELECT seq from sqlite_sequence WHERE name = '%s'" % table
     return _sql_request(sql)
-
 
 
 # Password
@@ -253,7 +255,6 @@ def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_dat
 def delete_patient_info(_id: int):
     sql = "DELETE FROM patient_info WHERE id = %d" % _id
     return _sql_request(sql)
-
 
 
 # Doctor
