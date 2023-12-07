@@ -23,7 +23,7 @@ class MainWindow:
 
 
 
-        self.frame1 = frame.Identity_Frame(self.window)
+        self.frame1 = frame.Nurse_Frame(self.window,100000000001)
 
 
 
