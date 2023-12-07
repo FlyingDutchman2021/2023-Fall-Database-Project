@@ -84,7 +84,7 @@ class Log_In_Frame(Base_Frame):
         ctk.CTkLabel(master=self.frame, text='Password').grid(row=1, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.account, width=200).grid(
             row=0, column=1, columnspan=2, padx=10, pady=12)
-        ctk.CTkEntry(master=self.frame, textvariable=self.password, show = '*', width=200).grid(
+        ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=200).grid(
             row=1, column=1, columnspan=2, padx=10, pady=12)
         ctk.CTkButton(master=self.frame, text="Log in", width=10, command=lambda: self.Log_in()).grid(
             row=2, column=1, padx=10, pady=12)
@@ -111,6 +111,7 @@ class Log_In_Frame(Base_Frame):
         else:
             messagebox.showerror('Error', status)
 
+
     def Sign_up(self):
         if self.identity == "patient":
             self.switch_Sign_Up_Patient()
@@ -118,6 +119,7 @@ class Log_In_Frame(Base_Frame):
             self.switch_Sign_Up_Doctor()
         if self.identity == "nurse":
             self.switch_Sign_Up_Nurse()
+
 
 class Sign_up_Patient_Frame(Base_Frame):
     def __init__(self, master):
@@ -196,7 +198,7 @@ class Sign_up_Patient_Frame(Base_Frame):
         ctk.CTkLabel(master=self.frame, textvariable=self.Label, width=5).grid(  # pass or fail
             row=8, column=4, padx=10, pady=12)
 
-        ctk.CTkEntry(master=self.frame, textvariable=self.note, show='*', width=300).grid(
+        ctk.CTkEntry(master=self.frame, textvariable=self.note, width=300).grid(
             row=9, column=1, columnspan=3, padx=10, pady=12)
 
         self.password.trace_add("write", self.Password_confirmation)
@@ -205,7 +207,6 @@ class Sign_up_Patient_Frame(Base_Frame):
         # 确认按钮，点击后提交注册
         ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(row=10, column=1, padx=10,
                                                                                              pady=12)
-
 
 
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("patient")).grid(
@@ -246,7 +247,7 @@ class Sign_up_Patient_Frame(Base_Frame):
     def register(self):
         # 输入是否有空
         if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
-                    self.birthday_year.get(), self.note.get(), self.birthday_month.get(), self.birthday_day.get(), self.gender.get()]):
+                    self.birthday_year.get(), self.birthday_month.get(), self.birthday_day.get(), self.gender.get()]):
             messagebox.showerror("Error", "Please fill in all fields")
             return
 
@@ -288,7 +289,7 @@ class Sign_up_Patient_Frame(Base_Frame):
 
         if result == 'Success':
             messagebox.showinfo("Success", "Registration successful")
-            self.switch_Log_In("Patient")
+            self.switch_Log_In("patient")
         else:
             messagebox.showerror("Error", result)
 
@@ -303,7 +304,6 @@ class Sign_up_Patient_Frame(Base_Frame):
 
     def validate_blood_type(self, blood_type):
         return blood_type in ["A", "B", "O", "AB"]
-
 
 
 class Sign_up_Doctor_Frame(Base_Frame):
@@ -351,7 +351,7 @@ class Sign_up_Doctor_Frame(Base_Frame):
 
         ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(
             row=7, column=1, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("Patient")).grid(
+        ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("doctor")).grid(
             row=7, column=3, padx=10, pady=12)
         self.frame.pack()
 
@@ -393,7 +393,7 @@ class Sign_up_Doctor_Frame(Base_Frame):
 
         if result == 'Success':
             messagebox.showinfo("Success", "Registration successful")
-            self.switch_Log_In("Doctor")  # 假设有专门的医生登录界面
+            self.switch_Log_In("doctor")  # 假设有专门的医生登录界面
         else:
             messagebox.showerror("Error", result)
 
@@ -453,7 +453,7 @@ class Sign_up_Nurse_Frame(Base_Frame):
 
         ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(
             row=7, column=1, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("Patient")).grid(
+        ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("nurse")).grid(
             row=7, column=3, padx=10, pady=12)
         self.frame.pack()
 
@@ -495,7 +495,7 @@ class Sign_up_Nurse_Frame(Base_Frame):
 
         if result == 'Success':
             messagebox.showinfo("Success", "Registration successful")
-            self.switch_Log_In("Doctor")  # 假设有专门的医生登录界面
+            self.switch_Log_In("nurse")
         else:
             messagebox.showerror("Error", result)
 
