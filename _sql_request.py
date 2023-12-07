@@ -139,6 +139,10 @@ def find_latest_entry(table: str):
     return _sql_request(sql)
 
 
+
+
+
+
 # Find password according to id and identity
 #
 # _id: 12 digits integer,
@@ -160,15 +164,20 @@ def add_password(_id: int, _identity: str, _password: str):
     return _sql_request(sql)
 
 
+def update_password(_id: int, _identity: str, _password: str):
+    sql = "UPDATE password SET password = '%s' WHERE id = %d and identity = '%s'" % (_password, _id, _identity)
+    return _sql_request(sql)
+
+
 # _identity: P, D, or N
 def delete_password(_id: int, _identity: str):
     sql = "DELETE FROM password WHERE id = %d and identity = '%s'" % (_id, _identity)
     return _sql_request(sql)
 
 
-def update_password(_id: int, _identity: str, _password: str):
-    sql = "UPDATE password SET password = '%s' WHERE id = %d and identity = '%s'" % (_password, _id, _identity)
-    return _sql_request(sql)
+
+
+
 
 
 def show_info(_target_table: str, start: int, number_of_page: int):
@@ -221,11 +230,6 @@ def add_patient_info(_email: str, _name: str, _sex: str, _birth_date: int,
     return _sql_request(sql)
 
 
-def delete_patient_info(_id: int):
-    sql = "DELETE FROM patient_info WHERE id = %d" % _id
-    return _sql_request(sql)
-
-
 def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_date: int,
                         _blood_type: str, _contact_number: int, _note: str = ''):
     sql = ("UPDATE patient_info SET email = '%s', name = '%s', sex = '%s', birth_date = %d, "
@@ -233,6 +237,11 @@ def update_patient_info(_id: int, _email: str, _name: str, _sex: str, _birth_dat
                                                                                     _birth_date, _blood_type,
                                                                                     _contact_number, _note,
                                                                                     _id)
+    return _sql_request(sql)
+
+
+def delete_patient_info(_id: int):
+    sql = "DELETE FROM patient_info WHERE id = %d" % _id
     return _sql_request(sql)
 
 
@@ -264,6 +273,11 @@ def delete_doctor_info(_id: int):
     return _sql_request(sql)
 
 
+def show_pending_nurse(start: int, number_of_page: int):
+    sql = "SELECT * FROM nurse_info WHERE status='P' LIMIT %d OFFSET %d" % (number_of_page, start - 1)
+    return _sql_request(sql)
+
+
 def add_nurse_info(email: str, name: str, sex: str, contact_number: int, department: str, status: str, isMaster: int):
     sql = ("INSERT INTO nurse_info (email, name, sex, contact_number, department, status, isMaster) "
            "VALUES ('%s','%s','%s', %d, '%s', '%s', %d)") % (email, name, sex, contact_number, department,
@@ -282,7 +296,7 @@ def update_nurse_status(_id: int, status: str):
     return _sql_request(sql)
 
 
-def update_nurse_inMaster(_id, isMaster: bool):
+def update_nurse_isMaster(_id, isMaster: bool):
     value = 1 if isMaster else 0
     sql = "UPDATE nurse_info SET isMaster = %d WHERE id = %d" % (value, _id)
     return _sql_request(sql)

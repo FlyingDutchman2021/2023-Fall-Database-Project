@@ -107,11 +107,12 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
 # error: Success, SQL Error
 def delete_patient_account(_id: int):
     status1, result = db.delete_patient_info(_id)
-    status2, result = db.delete_password(_id, 'P')
-    if status1 == 'Success' and status2 == 'Success':
-        return 'Success'
-    else:
+    if not status1 == 'Success':
         return 'SQL Error'
+    status2, result = db.delete_password(_id, 'P')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
 
 def register_doctor(email: str, name: str, sex: str, contact_number: str, password: str):
@@ -139,7 +140,6 @@ def register_doctor(email: str, name: str, sex: str, contact_number: str, passwo
     return 'Success'
 
 
-
 def delete_doctor_account(_id: int):
     status1, result1 = db.delete_doctor_info(_id)
     if not status1 == 'Success':
@@ -150,12 +150,36 @@ def delete_doctor_account(_id: int):
     return 'Success'
 
 
-def register_nurse():
-    pass
+def register_nurse(email: str, name: str, sex: str, contact_number: str, password: str):
+
+    if not db.isEmail(email):
+        return 'error: Format'
+    if not db.isContactNumber(contact_number):
+        return 'error: Format'
+    email = db.purify(email)
+    name = db.purify(name)
+    contact_number = int(contact_number)
+    status1, result1 = db.add_nurse_info(email, name, sex, contact_number, '', 'P', 0)
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status2, result2 = db.find_latest_entry('nurse')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    _id = result2[0][0]
+    status3, result3 = db.add_password(_id, 'N', db.hash_new_password(password))
+    if not status3 == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
 
-def delete_nurse_account():
-    pass
+def delete_nurse_account(_id: int):
+    status1, result1 = db.delete_nurse_info(_id)
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status2, result2 = db.delete_password(_id, 'N')
+    if not status2 == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
 
 # Get personal info using user ID and identity
