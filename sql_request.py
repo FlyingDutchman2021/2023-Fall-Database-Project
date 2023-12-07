@@ -84,13 +84,16 @@ def register_patient(_email: str, _name: str, _sex: str, _birth_date: str,
     _contact_number = int(_contact_number)
 
     # Get id
-    status, result = db.find_latest_entry('patient')
-    _id = result[0][0]
+
 
     # Add Info
     status1, result_list1 = db.add_patient_info(_email, _name, _sex, _birth_date, _blood_type, _contact_number, _note)
+    if not status1 == 'Success':
+        return 'SQL Error'
+    status, result = db.find_latest_entry('patient')
+    _id = result[0][0]
     status2, result_list2 = db.add_password(_id, 'P', db.hash_new_password(password))
-    if status1 == 'Success' and status2 == 'Success':
+    if status2 == 'Success':
         return 'Success'
     else:
         return 'SQL Error'
