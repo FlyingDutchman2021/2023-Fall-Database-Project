@@ -312,8 +312,7 @@ def update_password(_id: int, _identity: str, old_password: str, new_password: s
     elif _identity == 'doctor':
         identity = 'D'
 
-
-    status1, result1 = db.find_password(_id,identity)
+    status1, result1 = db.find_password(_id, identity)
     if status1 != 'Success':
         return 'SQL Error'
     stored_password = rtn_find_result[0][0]
@@ -330,11 +329,26 @@ def update_password(_id: int, _identity: str, old_password: str, new_password: s
 
     return 'Success'
 # update doctor_info_status and etc
-# update nurse_info_status and etc
-# update password
 # search doctor
 # search nurse
 # search patient
 # add test/prescription
 # find test/prescription
-# delete 
+# delete
+
+
+def bed_assign(room: int, bed: int, patient_id: int):
+    # 检查床位是否已被占用
+    status, result = check_bed_availability(room, bed)
+    if status != 'Success':
+        return 'SQL Error'
+
+    # 如果结果为空列表，表示床位可用
+    if len(result) == 0:
+        # 分配床位给病人
+        status, assign_result = assign_bed_to_patient(room, bed, patient_id)
+        if status != 'Success':
+            return 'SQL Error'
+        return 'Success'
+    else:
+        return 'Bed already occupied'
