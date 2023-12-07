@@ -2,6 +2,18 @@ import _sql_request as db
 import bcrypt as bc
 
 
+def isEmail(entry: str):
+    return db.isEmail(entry)
+
+
+def isContactNumber(entry: str):
+    return db.isContactNumber(entry)
+
+
+def isID(entry: str):
+    return db.isID(entry)
+
+
 # Return <status>, possible status:
 # SQL Error, User not found, Invalid username, Success, Wrong Password
 def login(_id_contact_email: str, _password: str, _identity: str) -> (str, int):
