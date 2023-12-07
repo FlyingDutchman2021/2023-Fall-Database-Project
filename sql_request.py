@@ -146,7 +146,6 @@ def delete_doctor_account(_id: int):
 
 
 def register_nurse(email: str, name: str, sex: str, contact_number: str, password: str):
-
     if not db.isEmail(email):
         return 'error: Format'
     if not db.isContactNumber(contact_number):
@@ -192,6 +191,35 @@ def get_personal_info(_id: int, _identity: str):
     return 'Success', result
 
 
+# Universal
+def update_password(_id: int, _identity: str, old_password: str, new_password: str):
+    # 确认旧密码的正确性
+
+    if _identity == 'nurse':
+        identity = 'N'
+    elif _identity == 'patient':
+        identity = 'P'
+    elif _identity == 'doctor':
+        identity = 'D'
+
+    status1, result1 = db.find_password(_id, identity)
+    if status1 != 'Success':
+        return 'SQL Error'
+    stored_password = result1[0][0]
+    if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
+        return 'Wrong Password'
+
+    # 哈希处理新密码
+    hashed_password = db.hash_new_password(new_password)
+
+    # 更新密码
+    status, result = db.update_password(_id, 'N', hashed_password)
+    if status != 'Success':
+        return 'SQL Error'
+
+    return 'Success'
+
+
 # Return <status>
 # possible status:
 # error: Email Format, error: Contact Number Format, Success, SQL Error
@@ -232,8 +260,14 @@ def update_doctor_general(_id: int, email: str, name: str, sex: str, contact_num
     return 'Success'
 
 
+def update_doctor_admin(_id: int, department: str, status: str):
+    status, result = db.update_doctor_admin(_id, department, status)
+    if not status == 'Success':
+        return 'SQL Error'
+    return 'Success'
 
-def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number: str):
+
+def update_nurse_general(_id: int, email: str, name: str, sex: str, contact_number: str):
     if not db.isEmail(email):
         return 'error: Format'
     if not db.isContactNumber(contact_number):
@@ -252,78 +286,34 @@ def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number:
     return 'Success'
 
 
-# 管理员对护士的修改
 def update_nurse_admin(_id: int, department: str, status: str, isMaster: bool):
-
-    # 更新状态
-    status, result = db.update_nurse_status(_id, department, status, isMaster)
+    status, result = db.update_nurse_admin(_id, department, status, isMaster)
     if status != 'Success':
         return 'SQL Error'
-
     return 'Success'
 
 
+# update doctor_info_status
+# universal search
 
-# def update_nurse_password(_id: int, old_password: str, new_password: str):
-#     # 确认旧密码的正确性
-#     status1, result1 = db.find_password(_id,'N')
-#     if status1 != 'Success':
-#         return 'SQL Error'
-#     stored_password = rtn_find_result[0][0]
-#     if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
-#         return 'Wrong Password'
-#
-#     # 哈希处理新密码
-#     hashed_password = db.hash_new_password(new_password)
-#
-#     # 更新密码
-#     status, result = db.update_password(_id, 'N', hashed_password)
-#     if status != 'Success':
-#         return 'SQL Error'
-#
-#     return 'Success'
-
-# 通用的修改密码
-def update_password(_id: int, _identity: str, old_password: str, new_password: str):
-    # 确认旧密码的正确性
-
-    if _identity == 'nurse':
-        identity = 'N'
-    elif _identity == 'patient':
-        identity = 'P'
-    elif _identity == 'doctor':
-        identity = 'D'
-
-    status1, result1 = db.find_password(_id, identity)
-    if status1 != 'Success':
-        return 'SQL Error'
-    stored_password = result1[0][0]
-    if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
-        return 'Wrong Password'
-
-    # 哈希处理新密码
-    hashed_password = db.hash_new_password(new_password)
-
-    # 更新密码
-    status, result = db.update_password(_id, 'N', hashed_password)
-    if status != 'Success':
-        return 'SQL Error'
-
-    return 'Success'
-# update doctor_info_status and etc
-# search doctor
-# search nurse
-# search patient
 # add test/prescription
 # find test/prescription
 # delete
 
+# add room assignment
+# find room assignment
+# delete
+
+# add nurse assignment
+# find nurse assignment
+# delete
 
 # Purify all db. operation
 
+
 def bed_assign(room: int, bed: int, patient_id: int):
     # 检查床位是否已被占用
-    status, result = check_bed_availability(room, bed)
+    status, result = db.check_bed_availability(room, bed)
     if status != 'Success':
         return 'SQL Error'
 

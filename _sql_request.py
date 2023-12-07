@@ -283,7 +283,7 @@ def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_nu
     return _sql_request(sql)
 
 
-def update_doctor_status(_id: int, department: str, status: str):
+def update_doctor_admin(_id: int, department: str, status: str):
     sql = "UPDATE doctor_info SET department='%s', status='%s' WHERE id=%d" % (department, status, _id)
     return _sql_request(sql)
 
@@ -320,7 +320,7 @@ def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number:
     return _sql_request(sql)
 
 
-def update_nurse_status(_id: int, department: str, status: str, isMaster: bool):
+def update_nurse_admin(_id: int, department: str, status: str, isMaster: bool):
     isMaster = 1 if isMaster else 0
     sql = ("UPDATE nurse_info SET department='%s', status = '%s', isMaster=%d WHERE id = %d"
            % (department, status, isMaster, _id))
