@@ -236,11 +236,13 @@ def update_doctor_info(_id: int, email: str, name: str, sex: str, contact_number
 
     # Update Info
     status1, result_list1 = db.update_doctor_info(_id, email, name, sex, contact_number)
+    #
     if not status1 == 'Success':
         return 'SQL Error'
     status2, result_list2 = db.find_latest_entry('doctor')
     if not status2 == 'Success':
         return 'SQL Error'
+
     _id = result_list2[0][0]
     status3, result_list3 = db.add_password(_id, 'D', db.hash_new_password(password))
     if not status3 == 'Success':
@@ -249,10 +251,84 @@ def update_doctor_info(_id: int, email: str, name: str, sex: str, contact_number
 
 
 
-def update_nurse_info():
-    pass
+def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number: str):
+    if not db.isEmail(email):
+        return 'error: Format'
+    if not db.isContactNumber(contact_number):
+        return 'error: Format'
+
+    # 净化输入
+    email = db.purify(email)
+    name = db.purify(name)
+    contact_number = int(db.purify(contact_number))
+
+    # 更新信息
+    status, result = db.update_nurse_info(_id, email, name, sex, contact_number)
+    if status != 'Success':
+        return 'SQL Error'
+
+    return 'Success'
 
 
+# 管理员对护士的修改
+def update_nurse_admin(_id: int, department: str, status: str, isMaster: bool):
+
+    # 更新状态
+    status, result = db.update_nurse_status(_id, department, status, isMaster)
+    if status != 'Success':
+        return 'SQL Error'
+
+    return 'Success'
+
+
+
+# def update_nurse_password(_id: int, old_password: str, new_password: str):
+#     # 确认旧密码的正确性
+#     status1, result1 = db.find_password(_id,'N')
+#     if status1 != 'Success':
+#         return 'SQL Error'
+#     stored_password = rtn_find_result[0][0]
+#     if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
+#         return 'Wrong Password'
+#
+#     # 哈希处理新密码
+#     hashed_password = db.hash_new_password(new_password)
+#
+#     # 更新密码
+#     status, result = db.update_password(_id, 'N', hashed_password)
+#     if status != 'Success':
+#         return 'SQL Error'
+#
+#     return 'Success'
+
+# 通用的修改密码
+def update_password(_id: int, _identity: str, old_password: str, new_password: str):
+    # 确认旧密码的正确性
+
+    if _identity == 'nurse':
+        identity = 'N'
+    elif _identity == 'patient':
+        identity = 'P'
+    elif _identity == 'doctor':
+        identity = 'D'
+
+
+    status1, result1 = db.find_password(_id,identity)
+    if status1 != 'Success':
+        return 'SQL Error'
+    stored_password = rtn_find_result[0][0]
+    if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
+        return 'Wrong Password'
+
+    # 哈希处理新密码
+    hashed_password = db.hash_new_password(new_password)
+
+    # 更新密码
+    status, result = db.update_password(_id, 'N', hashed_password)
+    if status != 'Success':
+        return 'SQL Error'
+
+    return 'Success'
 # update doctor_info_status and etc
 # update nurse_info_status and etc
 # update password

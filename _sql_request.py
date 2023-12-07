@@ -314,9 +314,9 @@ def add_nurse_info(email: str, name: str, sex: str, contact_number: int, departm
     return _sql_request(sql)
 
 
-def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number: int, department: str):
-    sql = ("UPDATE nurse_info set email = '%s', name = '%s', sex = '%s', contact_number = %d, department = '%s' "
-           "WHERE id = %d") % (email, name, sex, contact_number,department, _id)
+def update_nurse_info(_id: int, email: str, name: str, sex: str, contact_number: int):
+    sql = ("UPDATE nurse_info set email = '%s', name = '%s', sex = '%s', contact_number = %d "
+           "WHERE id = %d") % (email, name, sex, contact_number, _id)
     return _sql_request(sql)
 
 
