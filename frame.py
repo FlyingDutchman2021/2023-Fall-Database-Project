@@ -4,14 +4,36 @@ import sql_request
 
 
 class Base_Frame:
+
+    def setup_main_window(self):
+        # 主题色和字体
+        self.primary_color = '#4a90e2'
+        self.secondary_color = '#f0f0f0'
+        self.accent_color = '#5cb85c'
+        self.font = 'Arial 10'
+
+        # 设置窗口
+        full_width = self.window.winfo_screenwidth()
+        full_height = self.window.winfo_screenheight()
+        width_percentage = 0.82
+        height_percentage = 0.79
+        self.window.geometry(
+            '%dx%d+%d+%d' % (full_width * width_percentage, full_height * height_percentage,
+                             full_width * (1 - width_percentage) / 2,
+                             full_height * ((1 - height_percentage) / 2 - 0.015)))
+        self.window.title('Hospital Management System')
+        self.window.config(bg=self.secondary_color)  # 设置窗口背景色
+
     def __init__(self, master):
         self.tk_frame = ctk.CTkFrame(master)
         self.tk_frame.pack(fill="both", expand=True)
 
-    def switch_Log_In(self, identity):
-        for widget in self.tk_frame.winfo_children():
+        self.setup_main_window() # 给主窗口设置颜色和字体
+
+    def switch_Log_In(self, identity):  # 界面切换
+        for widget in self.tk_frame.winfo_children():  # 先销毁所有部件
             widget.destroy()
-        Log_In_Frame(self.tk_frame, identity)
+        Log_In_Frame(self.tk_frame, identity) # 加载新界面
 
     def switch_Sign_Up_Patient(self):
         for widget in self.tk_frame.winfo_children():
@@ -89,7 +111,9 @@ class Log_In_Frame(Base_Frame):
         self.frame.pack()
 
     def Log_in(self):
-        status, id = sql_request.login(str(self.account.get()), str(self.password.get()), self.identity)
+        status, id = sql_request.login(str(self.account.get()),
+                                       str(self.password.get()),
+                                       self.identity) # 验证账号密码
         if status == 'Success':
             if self.identity == "patient":
                 self.switch_Patient(id)
@@ -113,6 +137,8 @@ class Log_In_Frame(Base_Frame):
 class Sign_up_Patient_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
+
+        # 存储用户输入的内容
         self.name = ctk.StringVar()
         self.birthday = ctk.StringVar()
         self.birthday_year = ctk.StringVar()
@@ -127,11 +153,14 @@ class Sign_up_Patient_Frame(Base_Frame):
         self.frame = ctk.CTkFrame(self.tk_frame)
         self.year = []
         self.month = []
+
+        # 循环生成时间
         for i in range(100):
             self.year.append(str(1930 + i))
         for i in range(12):
             self.month.append(str(1 + i))
 
+        # 输入内容:标签+输入框
         ctk.CTkLabel(master=self.frame, text="Please enter your message", width=200).grid(
             row=0, column=0, columnspan=4, padx=10, pady=12)
 
@@ -162,8 +191,7 @@ class Sign_up_Patient_Frame(Base_Frame):
 
         ctk.CTkEntry(master=self.frame, textvariable=self.contact_number, width=300).grid(
             row=4, column=1, columnspan=3, padx=10, pady=12)
-        ctk.CTkEntry(master=self.frame, textvariable=self.email, width=300).grid(
-            row=5, column=1, columnspan=3, padx=10, pady=12)
+
         ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=300).grid(
             row=6, column=1, columnspan=3, padx=10, pady=12)
         ctk.CTkEntry(master=self.frame, textvariable=self.password_, show='*', width=300).grid(
@@ -173,21 +201,29 @@ class Sign_up_Patient_Frame(Base_Frame):
         self.password.trace_add("write", self.Password_confirmation)
         self.password_.trace_add("write", self.Password_confirmation)
 
-        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
-            row=8, column=1, padx=10, pady=12)
+        # 确认按钮，点击后提交注册
+        ctk.CTkButton(master=self.frame, text="Finish", width=5, command=self.register).grid(row=8, column=1, padx=10,
+                                                                                             pady=12)
+
+        #不理解密码确认要用在哪里
+        # ctk.CTkButton(master=self.frame, text="Finish", width=5, command=lambda: self.Password_confirmation()).grid(
+        #     row=8, column=1, padx=10, pady=12)
+
+
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("Patient")).grid(
             row=8, column=3, padx=10, pady=12)
         self.frame.pack()
 
-    def Password_confirmation(self, *args):
+    # 验证密码
+    def Password_confirmation(self, *args):  # 二次确认密码相同，检查密码相同
         self.Label.set('')
         if self.password.get() != '' and self.password_.get() != '':
-            if self.password.get() == self.password_.get():
+            if self.password.get() == self.password_.get():  # 密码是否相等
                 self.Label.set('Pass')
             else:
                 self.Label.set('Fail')
 
-    def show_day(self, *args):
+    def show_day(self, *args): # 显示日期
         self._day.set('')
         day = []
         if self.birthday_month.get() != '' and self.birthday_year.get() != '':
@@ -207,6 +243,30 @@ class Sign_up_Patient_Frame(Base_Frame):
                     for i in range(28):
                         day.append(str(1 + i))
             self._day.configure(values=day)
+
+    # 获得输入信息，注册，返回注册结果
+    def register(self):
+        # 基本输入验证
+        if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
+                    self.birthday_year.get(), self.birthday_month.get(), self.birthday_day.get(), self.gender.get()]):
+            messagebox.showerror("Error", "Please fill in all fields")
+            return
+
+        # 调用后端函数进行注册
+        result = register_patient(
+            self.email.get(),
+            self.name.get(),
+            self.gender.get(),
+            birth_date,
+            self.contact_number.get(),
+            self.password.get()
+        )
+
+        if result == 'Success':
+            messagebox.showinfo("Success", "Registration successful")
+            self.switch_Log_In("Patient")
+        else:
+            messagebox.showerror("Error", result)
 
 
 class Sign_up_Doctor_Frame(Base_Frame):
