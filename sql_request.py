@@ -375,19 +375,22 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
     return 'Success', result
 
 
-# add test/prescription
-# find test/prescription
+
+# find prescription: using patient id to find his/her prescriptions (optional: order)
 # delete
 
-# add room assignment
-# find room assignment
+
+# find room assignment: using patient id to find room and bed / using room to find its patient
 # delete
 
 # add nurse assignment
-# find nurse assignment
+# find nurse assignment: using nurse id to find the room he / she is in charge of/ using room id to find the assigned nurse
 # delete
 
-# Purify all db. operation
+# Optional 挂号表 patient id and doctor id, time
+# 挂号即添加记录， 看完就删
+# 医生能看到挂他号的病人， 病人能看到他挂了谁的号： find using patient id / doctor id
+
 
 
 def bed_assign(room: int, bed: int, patient_id: int):
