@@ -55,20 +55,23 @@ class Identity_Frame(Base_Frame):
         super().__init__(master)
         self.frame = ctk.CTkFrame(self.tk_frame)
 
-        ctk.CTkLabel(master=self.frame, text="Choose your identity", width=200).grid(
-            row=0, column=0, columnspan=3, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Patient", width=10, command=lambda: self.Log_In("patient")).grid(
-            row=1, column=0, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Doctor", width=10, command=lambda: self.Log_In("doctor")).grid(
-            row=1, column=1, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Nurse", width=10, command=lambda: self.Log_In("nurse")).grid(
-            row=1, column=2, padx=10, pady=12)
+        # 更突出的标题
+        title_label = ctk.CTkLabel(master=self.frame, text="Choose your identity", font=("Arial", 14))
+        title_label.grid(row=0, column=0, columnspan=3, padx=20, pady=15)
 
-        self.frame.pack()
+        # 使用自定义样式的按钮
+        patient_button = ctk.CTkButton(master=self.frame, text="Patient", width=120, command=lambda: self.Log_In("patient"))
+        doctor_button = ctk.CTkButton(master=self.frame, text="Doctor", width=120, command=lambda: self.Log_In("doctor"))
+        nurse_button = ctk.CTkButton(master=self.frame, text="Nurse", width=120, command=lambda: self.Log_In("nurse"))
+
+        patient_button.grid(row=1, column=0, padx=10, pady=10)
+        doctor_button.grid(row=1, column=1, padx=10, pady=10)
+        nurse_button.grid(row=1, column=2, padx=10, pady=10)
+
+        self.frame.pack(pady=20, expand='yes')
 
     def Log_In(self, identity):
         self.switch_Log_In(identity)
-
 
 class Log_In_Frame(Base_Frame):
 
@@ -80,19 +83,26 @@ class Log_In_Frame(Base_Frame):
         self.password = ctk.StringVar()
         self.frame = ctk.CTkFrame(self.tk_frame)
 
-        ctk.CTkLabel(master=self.frame, text='Account').grid(row=0, column=0, padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame, text='Password').grid(row=1, column=0, padx=10, pady=12)
-        ctk.CTkEntry(master=self.frame, textvariable=self.account, width=200).grid(
-            row=0, column=1, columnspan=2, padx=10, pady=12)
-        ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=200).grid(
-            row=1, column=1, columnspan=2, padx=10, pady=12)
-        ctk.CTkButton(master=self.frame, text="Log in", width=10, command=lambda: self.Log_in()).grid(
-            row=2, column=1, padx=10, pady=12)
+        # 改进字体和文本标签
+        ctk.CTkLabel(master=self.frame, text='Account', font=("Arial", 12)).grid(row=0, column=0, padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame, text='Password', font=("Arial", 12)).grid(row=1, column=0, padx=10, pady=12)
 
-        ctk.CTkButton(master=self.frame, text="Sign up", width=10, command=lambda: self.Sign_up()).grid(
-            row=2, column=2, padx=10, pady=12)
+        # 输入框样式优化
+        ctk.CTkEntry(master=self.frame, textvariable=self.account, width=200).grid(row=0, column=1, columnspan=2,
+                                                                                   padx=10, pady=12)
+        ctk.CTkEntry(master=self.frame, textvariable=self.password, show='*', width=200).grid(row=1, column=1,
+                                                                                              columnspan=2, padx=10,
+                                                                                              pady=12)
 
-        self.frame.pack()
+        # 按钮样式优化
+        ctk.CTkButton(master=self.frame, text="Log in", width=120, command=lambda: self.Log_in()).grid(row=2, column=1,
+                                                                                                       padx=10, pady=12)
+        ctk.CTkButton(master=self.frame, text="Sign up", width=120, command=lambda: self.Sign_up()).grid(row=2,
+                                                                                                         column=2,
+                                                                                                         padx=10,
+                                                                                                         pady=12)
+
+        self.frame.pack(pady=20, expand='yes')
 
     def Log_in(self):
         status, id = sql_request.login(str(self.account.get()),
@@ -209,7 +219,7 @@ class Sign_up_Patient_Frame(Base_Frame):
 
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("patient")).grid(
             row=10, column=3, padx=10, pady=12)
-        self.frame.pack()
+        self.frame.pack(expand='yes')
 
     # 验证密码
     def Password_confirmation(self, *args):  # 二次确认密码相同，检查密码相同
@@ -303,7 +313,6 @@ class Sign_up_Patient_Frame(Base_Frame):
     def validate_blood_type(self, blood_type):
         return blood_type in ["A", "B", "O", "AB"]
 
-
 class Sign_up_Doctor_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -351,7 +360,7 @@ class Sign_up_Doctor_Frame(Base_Frame):
             row=7, column=1, padx=10, pady=12)
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("doctor")).grid(
             row=7, column=3, padx=10, pady=12)
-        self.frame.pack()
+        self.frame.pack(expand='yes')
 
     def Password_confirmation(self, *args):
         self.Label.set('')
@@ -404,8 +413,6 @@ class Sign_up_Doctor_Frame(Base_Frame):
         # 检查是否为11位数字
         return contact_number.isdigit() and len(contact_number) == 11
 
-
-
 class Sign_up_Nurse_Frame(Base_Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -453,7 +460,7 @@ class Sign_up_Nurse_Frame(Base_Frame):
             row=7, column=1, padx=10, pady=12)
         ctk.CTkButton(master=self.frame, text="Back", width=5, command=lambda: self.switch_Log_In("nurse")).grid(
             row=7, column=3, padx=10, pady=12)
-        self.frame.pack()
+        self.frame.pack(expand='yes')
 
     def Password_confirmation(self, *args):
         self.Label.set('')
@@ -506,7 +513,6 @@ class Sign_up_Nurse_Frame(Base_Frame):
         # 检查是否为11位数字
         return contact_number.isdigit() and len(contact_number) == 11
 
-
 class Patient_Frame(Base_Frame):
     def __init__(self, master, id):
         super().__init__(master)
@@ -542,11 +548,7 @@ class Patient_Frame(Base_Frame):
         self.Label1 = ctk.StringVar()
         self.Label2 = ctk.StringVar()
 
-
-
         self.password.set("123456789")
-
-
 
         self.year = []
         self.month = []
@@ -555,16 +557,23 @@ class Patient_Frame(Base_Frame):
         for i in range(12):
             self.month.append(str(1 + i))
 
+        # 左侧功能按钮区域样式优化
+        self.frame1 = ctk.CTkFrame(self.tk_frame, corner_radius=10)  # 添加圆角
+        self.frame1.pack(side='left', padx=10, fill='y', expand=False)
 
-        ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame1, textvariable=self.name).pack(padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="My medical records", width=5, command=lambda: self.Attendance_records()).pack(
-            padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="Personal Information", width=5, command=lambda: self.Personal_Information()).pack(
-            padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="ID: " + str(self.id)).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="Name: " + self.name.get()).pack(padx=10, pady=12)
 
-        self.frame1.pack(side='left', padx=10, fill='y')
-        self.frame2.pack(side='left', padx=10, fill='both', expand="yes")
+
+        # 按钮样式优化
+        ctk.CTkButton(master=self.frame1, text="My medical records", width=200,
+                      command=lambda: self.Attendance_records()).pack(padx=10, pady=10)
+        ctk.CTkButton(master=self.frame1, text="Personal Information", width=200,
+                      command=lambda: self.Personal_Information()).pack(padx=10, pady=10)
+
+        # 右侧信息显示区域
+        self.frame2 = ctk.CTkFrame(self.tk_frame, corner_radius=10)  # 添加圆角
+        self.frame2.pack(side='left', padx=10, fill='both', expand=True)
 
     def Attendance_records(self):
         for widget in self.frame2.winfo_children():
@@ -622,17 +631,6 @@ class Patient_Frame(Base_Frame):
             row=8, column=2, padx=10, pady=12)
 
         frame3.pack(expand="yes")
-
-    def Password_(self):
-        for widget in self.frame2.winfo_children():
-            widget.destroy()
-        frame = ctk.CTkFrame(self.frame2)
-        frame.pack(expand="yes")
-
-        ctk.CTkLabel(master=frame, text='Please enter your password').pack()
-        ctk.CTkEntry(master=frame, textvariable=self.password_entry, width=300, show='*').pack()
-        ctk.CTkLabel(master=frame, textvariable=self.Label1, width=5).pack()
-        self.password_entry.trace_add("write", self.Modify)
 
     def Modify(self,*args):
         self.Label1.set('')
@@ -705,6 +703,20 @@ class Patient_Frame(Base_Frame):
                 # 验证密码
             else:
                 self.Label1.set('The password is wrong')
+
+
+    def Password_(self):
+        for widget in self.frame2.winfo_children():
+            widget.destroy()
+        frame = ctk.CTkFrame(self.frame2)
+        frame.pack(expand="yes")
+
+        ctk.CTkLabel(master=frame, text='Please enter your password').pack()
+        ctk.CTkEntry(master=frame, textvariable=self.password_entry, width=300, show='*').pack()
+        ctk.CTkLabel(master=frame, textvariable=self.Label1, width=5).pack()
+        self.password_entry.trace_add("write", self.Modify)
+
+
 
     def Password_confirmation(self, *args):  # 二次确认密码相同，检查密码相同
                 self.Label2.set('')
@@ -799,7 +811,6 @@ class Patient_Frame(Base_Frame):
     def validate_blood_type(self, blood_type):
                 return blood_type in ["A", "B", "O", "AB"]
 
-
 class Doctor_Frame(Base_Frame):
     def __init__(self, master, id):
         super().__init__(master)
@@ -831,12 +842,12 @@ class Doctor_Frame(Base_Frame):
         self.password.set('123456789')
 
 
-        ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame1, textvariable=self.name).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="ID: " + str(self.id)).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="Name: " + self.name.get()).pack(padx=10, pady=12)
         if self.status.get()=="A":
-            ctk.CTkButton(master=self.frame1, text="My patients", width=5,
+            ctk.CTkButton(master=self.frame1, text="My patients", width=200,
                       command=lambda: self.My_patient()).pack(padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="Personal Information", width=5,
+        ctk.CTkButton(master=self.frame1, text="Personal Information", width=200,
                       command=lambda: self.Personal_Information()).pack(padx=10, pady=12)
 
         self.frame1.pack(side='left', padx=10, fill='y')
@@ -864,9 +875,9 @@ class Doctor_Frame(Base_Frame):
             row=1, column=1, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=Doctor, width=100).grid(
             row=1, column=2, padx=10, pady=12)
-        ctk.CTkButton(master=frame, text="Search", width=5, command=lambda: Search()).grid(
+        ctk.CTkButton(master=frame, text="Search", width=100, command=lambda: Search()).grid(
             row=1, column=8, padx=10, pady=12)
-        ctk.CTkButton(master=frame, text="Medical records", width=5, command=lambda: medical_records()).grid(
+        ctk.CTkButton(master=frame, text="Medical records", width=100, command=lambda: medical_records()).grid(
             row=2, column=8, padx=10, pady=12)
 
         tree = ttk.Treeview(frame,show="headings",height=20)
@@ -921,7 +932,6 @@ class Doctor_Frame(Base_Frame):
 
             def add():
                 pass
-
 
     def Personal_Information(self):
         for widget in self.frame2.winfo_children():
@@ -1092,15 +1102,16 @@ class Nurse_Frame(Base_Frame):
 
         self.password.set('123456789')
 
-        ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
-        ctk.CTkLabel(master=self.frame1, textvariable=self.name).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="ID: " + str(self.id)).pack(padx=10, pady=12)
+        ctk.CTkLabel(master=self.frame1, text="Name: " + self.name.get()).pack(padx=10, pady=12)
+
         if self.status.get()=="A":
-            ctk.CTkButton(master=self.frame1, text="Nursing wards", width=5,
+            ctk.CTkButton(master=self.frame1, text="Nursing wards", width=200,
                       command=lambda: self.Nursing_wards()).pack(padx=10, pady=12)
         if self.isMaster.get()=="1":
-            ctk.CTkButton(master=self.frame1, text="Work assignments", width=5,
+            ctk.CTkButton(master=self.frame1, text="Work assignments", width=200,
                           command=lambda: self.Assignment()).pack(padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="Personal Information", width=5,
+        ctk.CTkButton(master=self.frame1, text="Personal Information", width=200,
                       command=lambda: self.Personal_Information()).pack(padx=10, pady=12)
 
         self.frame1.pack(side='left', padx=10, fill='y')
@@ -1329,9 +1340,9 @@ class Administrator_Frame(Base_Frame):
 
         ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
         ctk.CTkLabel(master=self.frame1, text="Administrator").pack(padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="Doctor", width=5,
+        ctk.CTkButton(master=self.frame1, text="Doctor", width=200,
                       command=lambda: self.Doctor()).pack(padx=10, pady=12)
-        ctk.CTkButton(master=self.frame1, text="Nurse", width=5,
+        ctk.CTkButton(master=self.frame1, text="Nurse", width=200,
                       command=lambda: self.Nurse()).pack(padx=10, pady=12)
 
         self.frame1.pack(side='left', padx=10, fill='y')
