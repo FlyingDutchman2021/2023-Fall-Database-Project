@@ -22,11 +22,7 @@
     </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" object-ref="schemas/main/tables/nurse_info" />
-      <object connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" object-ref="schemas/main/tables/patient_info" />
-      <object connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" object-ref="schemas/main/tables/doctor_info" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.tests" active-filter-id="18faf403-76c2-4da0-9558-90076ca8798b">
@@ -72,6 +68,11 @@
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.doctor_info" active-filter-id="de1d9e84-b1a4-475f-b259-c0c2e362f8e7">
       <filter id="de1d9e84-b1a4-475f-b259-c0c2e362f8e7" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND">
         <condition column="id" operator="=" value="" active="false" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.bed_assignment" active-filter-id="e47be450-84c8-49f9-a25d-0b646609784a">
+      <filter id="e47be450-84c8-49f9-a25d-0b646609784a" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="bed" operator="=" value="" active="false" />
       </filter>
     </filter-actions>
   </component>

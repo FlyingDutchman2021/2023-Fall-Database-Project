@@ -898,7 +898,7 @@ class Doctor_Frame(Base_Frame):
         ctk.CTkLabel(master=self.frame1, text="ID: " + str(self.id)).pack(padx=10, pady=12)
         ctk.CTkLabel(master=self.frame1, text="Name: " + self.name.get()).pack(padx=10, pady=12)
         if self.status.get()=="A":
-            ctk.CTkButton(master=self.frame1, text="My patients", width=200,
+            ctk.CTkButton(master=self.frame1, text="Patients", width=200,
                       command=lambda: self.My_patient()).pack(padx=10, pady=12)
         ctk.CTkButton(master=self.frame1, text="Personal Information", width=200,
                       command=lambda: self.Personal_Information()).pack(padx=10, pady=12)
@@ -913,34 +913,29 @@ class Doctor_Frame(Base_Frame):
         ID = ctk.StringVar()
         ID_ = ctk.StringVar()
         Name = ctk.StringVar()
-        Doctor = ctk.StringVar()
         frame = ctk.CTkFrame(self.frame2)
         frame.pack(expand="yes")
 
         ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
-        ctk.CTkLabel(master=frame, text='Doctor').grid(row=0, column=2, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=ID, width=100).grid(
             row=1, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=ID_, width=100).grid(
             row=2, column=0, padx=10, pady=12)
         ctk.CTkEntry(master=frame, textvariable=Name, width=100).grid(
             row=1, column=1, padx=10, pady=12)
-        ctk.CTkEntry(master=frame, textvariable=Doctor, width=100).grid(
-            row=1, column=2, padx=10, pady=12)
         ctk.CTkButton(master=frame, text="Search", width=100, command=lambda: Search()).grid(
-            row=1, column=8, padx=10, pady=12)
+            row=1, column=6, padx=10, pady=12)
         ctk.CTkButton(master=frame, text="Medical records", width=100, command=lambda: medical_records()).grid(
-            row=2, column=8, padx=10, pady=12)
+            row=2, column=6, padx=10, pady=12)
 
         tree = ttk.Treeview(frame,show="headings",height=20)
-        tree["columns"] = ("id", "name", "gender", "birthday", "blood_type", "email", "contact number", "note", "doctor")
+        tree["columns"] = ("id", "email", "name", "gender", "birthday", "blood_type", "contact number", "note")
         tree.column("id", width=100, anchor='center')
         tree.column("name", width=100, anchor='center')
         tree.column("gender", width=100, anchor='center')
         tree.column("birthday", width=100, anchor='center')
         tree.column("contact number", width=150, anchor='center')
-        tree.column("doctor", width=100, anchor='center')
         tree.column("blood_type", width=100, anchor='center')
         tree.column("email", width=100, anchor='center')
         tree.column("note", width=300, anchor='center')
@@ -949,15 +944,29 @@ class Doctor_Frame(Base_Frame):
         tree.heading("gender", text="Gender")
         tree.heading("birthday", text="Birthday")
         tree.heading("contact number", text="Contact Number")
-        tree.heading("doctor", text="Doctor")
         tree.heading("blood_type", text="Blood_type")
         tree.heading("email", text="Email")
         tree.heading("note", text="Note")
-        tree.grid(row=3, column=0, columnspan=9, rowspan=5, padx=10, pady=12)
-
+        tree.grid(row=3, column=0, columnspan=8, rowspan=5, padx=10, pady=12)
+        message, Info = sql_request.universal_find_patient('')
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                tree.insert('', i, values=(
+                    Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6], Info[i][7]))
 
         def Search():
-            pass
+            search_key = ''
+            if ID.get() != '':
+                search_key = ID.get()
+            elif Name.get() != '':
+                search_key = Name.get()
+            message, Info = sql_request.universal_find_patient(search_key)
+            if message == 'Success':
+                tree.delete(*tree.get_children())
+                for i in range(len(Info)):
+                    tree.insert('', i, values=(
+                    Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6], Info[i][7]))
 
         def medical_records():
             for widget in self.frame2.winfo_children():
@@ -965,7 +974,7 @@ class Doctor_Frame(Base_Frame):
 
             frame = ctk.CTkFrame(self.frame2)
             frame.pack(expand="yes")
-            text = ctk.StringVar()
+            Content = ctk.StringVar()
 
             tree = ttk.Treeview(frame, show="headings",height=20)
             tree["columns"] = ("Time", "Doctor", "Content")
@@ -976,15 +985,33 @@ class Doctor_Frame(Base_Frame):
             tree.heading("Doctor", text="Doctor")
             tree.heading("Content", text="Content")
             tree.grid(row=1, column=0, columnspan=7, rowspan=10, padx=10, pady=12)
-            ctk.CTkEntry(master=frame, textvariable=text, width=300).grid(
+            ctk.CTkEntry(master=frame, textvariable=Content, width=300).grid(
                 row=0, column=2, padx=10, pady=12)
             ctk.CTkButton(master=frame, text="Add", width=5, command=lambda: add()).grid(
                 row=0, column=5, padx=10, pady=12)
             ctk.CTkButton(master=frame, text="Back", width=5, command=lambda: self.switch_Doctor(self.id)).grid(
                 row=0, column=6, padx=10, pady=12)
+            message, Info = sql_request.find_medical(ID_.get())
+            if message == 'Success':
+                tree.delete(*tree.get_children())
+                for i in range(len(Info)):
+                    tree.insert('', i, values=(
+                        Info[i][3], Info[i][2], Info[i][4]))
 
             def add():
-                pass
+                print(int(ID_.get()))
+                if Content.get() != '':
+                    result = sql_request.prescription_update(int(ID_.get()), self.id, Content.get())
+                    if result == 'Success':
+                        messagebox.showinfo("Success", "The addition was successful")
+                        message, Info = sql_request.find_medical(ID_.get())
+                        if message == 'Success':
+                            tree.delete(*tree.get_children())
+                            for i in range(len(Info)):
+                                tree.insert('', i, values=(
+                                    Info[i][3], Info[i][2], Info[i][4]))
+                    else:
+                        messagebox.showerror("Error", "The addition was failed")
 
     def Personal_Information(self):
         for widget in self.frame2.winfo_children():
@@ -1475,7 +1502,6 @@ class Administrator_Frame(Base_Frame):
         self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
-        Info = sql_request.get_personal_info(self.id, 'doctor')
 
         ctk.CTkLabel(master=self.frame1, text=self.id).pack(padx=10, pady=12)
         ctk.CTkLabel(master=self.frame1, text="Administrator").pack(padx=10, pady=12)
@@ -1541,10 +1567,30 @@ class Administrator_Frame(Base_Frame):
         tree.heading("contact number", text="Contact Number")
         tree.heading("status", text="Status")
         tree.grid(row=3, column=0, columnspan=7, rowspan=5, padx=10, pady=12)
+        message, Info = sql_request.universal_find_doctor('', '')
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                tree.insert('', i,
+                            values=(Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6]))
 
 
         def Search():
-            pass
+            search_key = ''
+            status = ''
+            if Status.get() == 1:
+                status = 'P'
+            if ID.get()!='':
+                search_key = ID.get()
+            elif Name.get()!='':
+                search_key = Name.get()
+            elif Department.get()!='':
+                search_key = Department.get()
+            message,Info = sql_request.universal_find_doctor(search_key,status)
+            if message == 'Success':
+                tree.delete(*tree.get_children())
+                for i in range(len(Info)):
+                    tree.insert('', i, values=(Info[i][0],Info[i][1],Info[i][2],Info[i][3],Info[i][4],Info[i][5],Info[i][6]))
 
         def Modify():
             pass
@@ -1613,9 +1659,35 @@ class Administrator_Frame(Base_Frame):
         tree.heading("status", text="Status")
         tree.heading("isMaster", text="isMaster")
         tree.grid(row=3, column=0, columnspan=8, rowspan=5, padx=10, pady=12)
+        message, Info = sql_request.universal_find_nurse('', '')
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                tree.insert('', i,
+                            values=(Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6], Info[i][7]))
 
         def Search():
-            pass
+            search_key = ''
+            status = ''
+            ismaster: bool = False
+            if Status.get() == 1:
+                status = 'P'
+            if isMaster.get() == 1:
+                ismaster = True
+            if ID.get() != '':
+                search_key = ID.get()
+            elif Name.get() != '':
+                search_key = Name.get()
+            elif Department.get() != '':
+                search_key = Department.get()
+            message, Info = sql_request.universal_find_nurse(search_key, status, ismaster)
+            if message == 'Success':
+                tree.delete(*tree.get_children())
+                for i in range(len(Info)):
+                    tree.insert('', i,
+                                values=(
+                                Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6],
+                                Info[i][7]))
 
         def Modify():
             pass

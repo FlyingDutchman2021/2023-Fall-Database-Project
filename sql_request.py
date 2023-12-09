@@ -3,6 +3,7 @@ import bcrypt as bc
 import datetime
 import sqlite3
 
+
 def isEmail(entry: str):
     return db.isEmail(entry)
 
@@ -294,7 +295,9 @@ def update_nurse_admin(_id: int, department: str, status: str, isMaster: bool):
 #
 #
 def universal_find_patient(search_key: str):
-    if search_key.isdigit():
+    if search_key == '':
+        sql = "SELECT * FROM patient_info"
+    elif search_key.isdigit():
         # is digit action
         search_key = search_key + '%'
         sql = ("SELECT * FROM patient_info WHERE contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s'"
@@ -315,7 +318,10 @@ def universal_find_patient(search_key: str):
 #         but if you want to filter the pending(P) or accepted(A) ones,
 #         enter 'P' or 'A'.
 def universal_find_doctor(search_key: str, status: str = ''):
-    if search_key.isdigit():
+    sql = ''
+    if search_key == '':
+        pass
+    elif search_key.isdigit():
         # is digit action
         search_key = search_key + '%'
         sql = ("SELECT * FROM doctor_info WHERE (contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s')"
@@ -328,11 +334,18 @@ def universal_find_doctor(search_key: str, status: str = ''):
                % (search_key_name, search_key, search_key))
 
     if status == '':
-        pass
+        if sql == '':
+            sql = "SELECT * FROM doctor_info"
     elif status == 'P':
-        sql = sql + " AND status='P'"
+        if sql == '':
+            sql = "SELECT * FROM doctor_info WHERE status='P'"
+        else:
+            sql = sql + " AND status='P'"
     elif status == 'A':
-        sql = sql + " AND status='A'"
+        if sql == '':
+            sql = "SELECT * FROM doctor_info WHERE status='A'"
+        else:
+            sql = sql + " AND status='A'"
     else:
         print('status value illegal!!!')
     status, result = db._sql_request(sql)
@@ -348,7 +361,12 @@ def universal_find_doctor(search_key: str, status: str = ''):
 # isMaster: if you want to filter the Master nurse, turn it to True,
 #           otherwise leave it there, don't touch it, it has default value.
 def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = False):
-    if search_key.isdigit():
+    sql = ''
+    if search_key == '' and status == '' and isMaster == False:
+        sql = "SELECT * FROM nurse_info"
+    if search_key == '':
+        pass
+    elif search_key.isdigit():
         # is digit action
         search_key = search_key + '%'
         sql = ("SELECT * FROM nurse_info WHERE (contact_number LIKE '%s' OR id LIKE '%s' OR email LIKE '%s')"
@@ -363,20 +381,28 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
     if status == '':
         pass
     elif status == 'P':
-        sql = sql + " AND status='P'"
+        if sql == '':
+            sql = "SELECT * FROM nurse_info WHERE status='P'"
+        else:
+            sql = sql + " AND status='P'"
     elif status == 'A':
-        sql = sql + " AND status='A'"
+        if sql == '':
+            sql = "SELECT * FROM nurse_info WHERE status='A'"
+        else:
+            sql = sql + " AND status='A'"
     else:
         print('status value illegal!!!')
 
     if isMaster is True:
-        sql = sql + " AND isMaster=1"
+        if sql == '':
+            sql = "SELECT * FROM nurse_info WHERE isMaster=1"
+        else:
+            sql = sql + " AND isMaster=1"
 
     status, result = db._sql_request(sql)
     if not status == 'Success':
         return 'SQL Error', []
     return 'Success', result
-
 
 
 # find prescription: using patient id to find his/her prescriptions (optional: order)
@@ -393,7 +419,6 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
 # Optional 挂号表 patient id and doctor id, time
 # 挂号即添加记录， 看完就删
 # 医生能看到挂他号的病人， 病人能看到他挂了谁的号： find using patient id / doctor id
-
 
 
 def bed_assign(room: int, bed: int, patient_id: int):
@@ -413,6 +438,15 @@ def bed_assign(room: int, bed: int, patient_id: int):
         return 'Bed already occupied'
 
 
+# Find medical records based on patient ID
+def find_medical(patient_id: str):
+    sql = ("SELECT * FROM prescriptions WHERE patient_id = %s" % patient_id)
+    status, result = db._sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
+
 # 处方更新
 def prescription_update(patient_id: int, doctor_id: int, content: str):
     # 获取当前系统时间并格式化为年月日时分的格式
@@ -420,7 +454,7 @@ def prescription_update(patient_id: int, doctor_id: int, content: str):
     date_time_created = int(date_time_created)
 
     # 插入新的处方记录，并获取该记录的ID
-    status, prescription_id = add_new_prescription(patient_id, doctor_id, date_time_created, content)
+    status, prescription_id = db.add_new_prescription(patient_id, doctor_id, date_time_created, content)
     if status != 'Success':
         return 'SQL Error'
 
