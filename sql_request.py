@@ -404,6 +404,7 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
         return 'SQL Error', []
     return 'Success', result
 
+
 # find prescription: using patient id to find his/her prescriptions (optional: order)
 # delete
 
@@ -411,8 +412,8 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
 # delete
 
 # add nurse assignment
-# find nurse assignment: using nurse id to find the room he / she is in charge of/ using room id to find the assigned nurse
-# delete
+# find nurse assignment: using nurse id to find the room he / she is in charge of/ using room id
+# to find the assigned nurse delete
 
 # Optional 挂号表 patient id and doctor id, time
 # 挂号即添加记录， 看完就删
@@ -434,6 +435,7 @@ def bed_assign(room: int, bed: int, patient_id: int):
     else:
         return 'Bed already occupied'
 
+
 # Find medical records based on patient ID
 def find_medical(patient_id: str):
     sql = ("SELECT * FROM prescriptions WHERE patient_id = %s" % patient_id)
@@ -441,6 +443,7 @@ def find_medical(patient_id: str):
     if not status == 'Success':
         return 'SQL Error', []
     return 'Success', result
+
 
 # 处方更新
 def prescription_update(patient_id: int, doctor_id: int, content: str):
@@ -456,6 +459,7 @@ def prescription_update(patient_id: int, doctor_id: int, content: str):
     # 返回成功状态和处方ID
     return 'Success'
 
+
 # Find the ward based on nurse_id
 def find_nurse_ward(nurse_id: str):
     sql = ("SELECT * FROM nurse_assignment WHERE nurse_id = %s" % nurse_id)
@@ -463,6 +467,7 @@ def find_nurse_ward(nurse_id: str):
     if not status == 'Success':
         return 'SQL Error', []
     return 'Success', result
+
 
 # Find the nurse based on room_id
 def find_ward_nurse(room_id: str):
@@ -472,9 +477,9 @@ def find_ward_nurse(room_id: str):
         return 'SQL Error', []
     return 'Success', result
 
-# Assign ward
-def assign_ward(nurse_id:int, room_id:int):
-    sql = ("UPDATE nurse_assignment SET room_id = %d WHERE nurse_id = %d "
-           %(room_id, nurse_id))
-    return db._sql_request(sql)
 
+# Assign ward
+def assign_ward(nurse_id: int, room_id: int):
+    sql = ("UPDATE nurse_assignment SET room_id = %d WHERE nurse_id = %d "
+           % (room_id, nurse_id))
+    return db._sql_request(sql)

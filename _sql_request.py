@@ -171,7 +171,6 @@ def find_password(_id: int, _identity: str):
 
 
 def hash_new_password(_new_password: str) -> str:
-
     print(str(_new_password))
 
     pd = bytes(_new_password, 'utf-8')
@@ -284,14 +283,12 @@ def add_doctor_info(_email: str, _name: str, _sex: str, _contact_number: int, _d
 
 
 def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_number: int):
-
     sql = ("UPDATE doctor_info SET email='%s', name='%s', sex='%s', contact_number=%d WHERE id=%d"
            % (_email, _name, _sex, _contact_number, _id))
     return _sql_request(sql)
 
 
 def update_doctor_admin(_id: int, department: str, status: str):
-
     sql = "UPDATE doctor_info SET department='%s', status='%s' WHERE id=%d" % (department, status, _id)
     return _sql_request(sql)
 
@@ -352,8 +349,9 @@ def assign_bed_to_patient(room: int, bed: int, patient_id: int):
     sql = "UPDATE bed_assignment SET patient_id = %d WHERE room = %d AND bed = %d" % (patient_id, room, bed)
     return _sql_request(sql)
 
+
 # 处方的操作
 def add_new_prescription(patient_id: int, doctor_id: int, date_time_created: int, content: str):
     sql = ("INSERT INTO prescriptions (patient_id, doctor_id, date_time_created, content) "
-           "VALUES ('%s','%s','%s','%s')") % (patient_id,doctor_id,date_time_created,content)
+           "VALUES ('%s','%s','%s','%s')") % (patient_id, doctor_id, date_time_created, content)
     return _sql_request(sql)
