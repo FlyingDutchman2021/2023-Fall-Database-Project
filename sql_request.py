@@ -404,10 +404,8 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
         return 'SQL Error', []
     return 'Success', result
 
-
 # find prescription: using patient id to find his/her prescriptions (optional: order)
 # delete
-
 
 # find room assignment: using patient id to find room and bed / using room to find its patient
 # delete
@@ -419,7 +417,6 @@ def universal_find_nurse(search_key: str, status: str = '', isMaster: bool = Fal
 # Optional 挂号表 patient id and doctor id, time
 # 挂号即添加记录， 看完就删
 # 医生能看到挂他号的病人， 病人能看到他挂了谁的号： find using patient id / doctor id
-
 
 def bed_assign(room: int, bed: int, patient_id: int):
     # 检查床位是否已被占用
@@ -437,7 +434,6 @@ def bed_assign(room: int, bed: int, patient_id: int):
     else:
         return 'Bed already occupied'
 
-
 # Find medical records based on patient ID
 def find_medical(patient_id: str):
     sql = ("SELECT * FROM prescriptions WHERE patient_id = %s" % patient_id)
@@ -445,7 +441,6 @@ def find_medical(patient_id: str):
     if not status == 'Success':
         return 'SQL Error', []
     return 'Success', result
-
 
 # 处方更新
 def prescription_update(patient_id: int, doctor_id: int, content: str):
@@ -460,3 +455,15 @@ def prescription_update(patient_id: int, doctor_id: int, content: str):
 
     # 返回成功状态和处方ID
     return 'Success'
+
+# Find the nurse–ward
+def find_nurse_ward(nurse_id: str):
+    sql = ("SELECT * FROM nurse_assignment WHERE patient_id = %s" % nurse_id)
+    status, result = db._sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
+# Assign ward
+def assign_ward(nurse_id:int, room_id:int):
+    pass

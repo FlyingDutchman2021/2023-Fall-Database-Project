@@ -594,6 +594,12 @@ class Patient_Frame(Base_Frame):
         tree.heading("Doctor", text="Doctor")
         tree.heading("Content", text="Content")
         tree.pack()
+        message, Info = sql_request.find_medical(self.id)
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                tree.insert('', i, values=(
+                    Info[i][3], Info[i][2], Info[i][4]))
 
     def Personal_Information(self):
         for widget in self.frame2.winfo_children():
@@ -803,56 +809,6 @@ class Patient_Frame(Base_Frame):
                     self._day.configure(values=day)
 
                 # 获得输入信息，注册，返回注册结果
-
-    def register(self):
-                # 输入是否有空
-                if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
-                            self.birthday_year.get(),  self.birthday_month.get(),
-                            self.birthday_day.get(), self.gender.get()]):
-                    messagebox.showerror("Error", "Please fill in all fields")
-                    return
-
-                # 验证联系电话格式
-                if not self.validate_contact_number(self.contact_number.get()):
-                    messagebox.showerror("Error", "Invalid contact number format")
-                    return
-
-                # 验证电子邮件格式
-                if not self.validate_email(self.email.get()):
-                    messagebox.showerror("Error", "Invalid email format")
-                    return
-
-                # 验证密码是否匹配
-                if self.password.get() != self.password_.get():
-                    messagebox.showerror("Error", "Passwords do not match")
-                    return
-
-                # 验证血型
-                if not self.validate_blood_type(self.blood_type.get()):
-                    messagebox.showerror("Error", "Invalid blood type. Please choose A, B, AB or O.")
-                    return
-
-                # 组合生日日期
-                birth_date = f"{self.birthday_year.get()}{self.birthday_month.get().zfill(2)}{self.birthday_day.get().zfill(2)}"
-
-                # 如果满足上述条件
-                # 调用后端函数进行注册
-                result = sql_request.register_patient(
-                    self.email.get(),
-                    self.name.get(),
-                    self.gender.get(),
-                    birth_date,
-                    self.blood_type.get(),
-                    self.contact_number.get(),
-                    self.note.get(),
-                    self.password.get()
-                )
-
-                if result == 'Success':
-                    messagebox.showinfo("Success", "Successfully modified")
-                    self.switch_Patient(self.id)
-                else:
-                    messagebox.showerror("Error", result)
 
     def validate_email(self, email):
                 # 电子邮件的基本验证正则表达式
@@ -1157,40 +1113,6 @@ class Doctor_Frame(Base_Frame):
 
         # 获得输入信息，注册，返回注册结果
 
-    def register(self):
-        # 输入验证
-        if not all(
-                [self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(), self.gender.get()]):
-            messagebox.showerror("Error", "Please fill in all fields")
-            return
-
-        if not self.validate_contact_number(self.contact_number.get()):
-            messagebox.showerror("Error", "Invalid contact number format")
-            return
-
-        if not self.validate_email(self.email.get()):
-            messagebox.showerror("Error", "Invalid email format")
-            return
-
-        if self.password.get() != self.password_.get():
-            messagebox.showerror("Error", "Passwords do not match")
-            return
-
-        # 调用后端注册函数
-        result = sql_request.register_doctor(
-            self.email.get(),
-            self.name.get(),
-            self.gender.get(),
-            self.contact_number.get(),
-            self.password.get()
-        )
-
-        if result == 'Success':
-            messagebox.showinfo("Success", "Successfully modified")
-            self.switch_Doctor(self.id)
-        else:
-            messagebox.showerror("Error", result)
-
     def validate_email(self, email):
         # 电子邮件的基本验证正则表达式
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -1457,40 +1379,6 @@ class Nurse_Frame(Base_Frame):
 
         # 获得输入信息，注册，返回注册结果
 
-    def register(self):
-        # 输入验证
-        if not all(
-                [self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(), self.gender.get()]):
-            messagebox.showerror("Error", "Please fill in all fields")
-            return
-
-        if not self.validate_contact_number(self.contact_number.get()):
-            messagebox.showerror("Error", "Invalid contact number format")
-            return
-
-        if not self.validate_email(self.email.get()):
-            messagebox.showerror("Error", "Invalid email format")
-            return
-
-        if self.password.get() != self.password_.get():
-            messagebox.showerror("Error", "Passwords do not match")
-            return
-
-        # 调用后端注册函数
-        result = sql_request.register_doctor(
-            self.email.get(),
-            self.name.get(),
-            self.gender.get(),
-            self.contact_number.get(),
-            self.password.get()
-        )
-
-        if result == 'Success':
-            messagebox.showinfo("Success", "Successfully modified")
-            self.switch_Nurse(self.id)
-        else:
-            messagebox.showerror("Error", result)
-
     def validate_email(self, email):
         # 电子邮件的基本验证正则表达式
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -1531,13 +1419,6 @@ class Administrator_Frame(Base_Frame):
         Status_ = ctk.IntVar()
         frame = ctk.CTkFrame(self.frame2)
         frame.pack(expand="yes")
-
-        self.Status_ = Status_
-        self.Status = Status
-        self.ID_ = ID_
-        self.ID = ID
-        self.Department_ = Department_
-        self.Department = Department
 
         ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
@@ -1605,16 +1486,27 @@ class Administrator_Frame(Base_Frame):
                     tree.insert('', i, values=(Info[i][0],Info[i][1],Info[i][2],Info[i][3],Info[i][4],Info[i][5],Info[i][6]))
 
         def Modify():
+            if Status_.get() == 1:
+                status = 'A'
+            else:
+                status = 'P'
 
             # 调用后端函数进行搜索
             result = sql_request.update_doctor_admin(
-                int(self.ID_.get()),  # 获取ID
-                self.Department_.get(),
-                self.Status_.get()
+                int(ID_.get()),  # 获取ID
+                Department_.get(),
+                status
             )
 
             if result == 'Success':
                 messagebox.showinfo("Success", "Successfully modified")
+                message, Info = sql_request.universal_find_doctor('', '')
+                if message == 'Success':
+                    tree.delete(*tree.get_children())
+                    for i in range(len(Info)):
+                        tree.insert('', i,
+                                    values=(
+                                    Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6]))
             else:
                 messagebox.showerror("Error", result)
 
@@ -1635,14 +1527,6 @@ class Administrator_Frame(Base_Frame):
         frame = ctk.CTkFrame(self.frame2)
         frame.pack(expand="yes")
 
-        self.Status_ = Status_
-        self.Status = Status
-        self.ID_ = ID_
-        self.ID = ID
-        self.Department_ = Department_
-        self.Department = Department
-        self.isMaster=isMaster
-        self.isMaster_=isMaster_
 
         ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
@@ -1722,17 +1606,33 @@ class Administrator_Frame(Base_Frame):
                                 Info[i][7]))
 
         def Modify():
+            if Status_.get() == 1:
+                status = 'A'
+            else:
+                status = 'P'
+            if isMaster_.get() == 1:
+                ismaster = True
+            else:
+                ismaster = False
+
 
             # 调用后端函数进行搜索
             result = sql_request.update_nurse_admin(
-                int(self.ID_.get()),  # 获取ID
-                self.Department_.get(),
-                self.Status_.get(),
-                bool(self.isMaster.get())
-            )
+                int(ID_.get()),  # 获取ID
+                Department_.get(),
+                status,
+                ismaster)
 
             if result == 'Success':
                 messagebox.showinfo("Success", "Successfully modified")
+                message, Info = sql_request.universal_find_nurse('', '')
+                if message == 'Success':
+                    tree.delete(*tree.get_children())
+                    for i in range(len(Info)):
+                        tree.insert('', i,
+                                    values=(
+                                    Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info[i][6],
+                                    Info[i][7]))
             else:
                 messagebox.showerror("Error", result)
 
