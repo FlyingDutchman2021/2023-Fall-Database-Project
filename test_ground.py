@@ -17,7 +17,7 @@ class MainWindow:
         self.window = ctk.CTk()
         self.setup_main_window()
 
-        self.frame1 = frame.Administrator_Frame(self.window,100)
+        self.frame1 = frame.Nurse_Frame(self.window,100000000001)
 
         # Main loop
         self.window.mainloop()

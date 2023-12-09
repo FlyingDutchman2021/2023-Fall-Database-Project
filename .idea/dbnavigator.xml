@@ -22,9 +22,7 @@
     </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" object-ref="schemas/main/tables/nurse_info" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.tests" active-filter-id="18faf403-76c2-4da0-9558-90076ca8798b">
@@ -58,7 +56,7 @@
       </filter>
     </filter-actions>
     <filter-actions connection-id="70fb3ea9-4120-463f-a888-c302ec8097ea" dataset="main.nurse_assignment" active-filter-id="223cc67d-907e-49c7-afdb-636c09129385">
-      <filter id="223cc67d-907e-49c7-afdb-636c09129385" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+      <filter id="223cc67d-907e-49c7-afdb-636c09129385" name="Filter" temporary="false" custom-name="false" type="basic" join-type="AND">
         <condition column="nurse_id" operator="=" value="" active="false" />
       </filter>
     </filter-actions>
@@ -143,7 +141,7 @@
           <session-management value="true" />
           <ddl-file-binding value="true" />
           <database-logging value="true" />
-          <connect-automatically value="true" />
+          <connect-automatically value="false" />
           <restore-workspace value="true" />
           <restore-workspace-deep value="false" />
           <environment-type value="default" />

@@ -1182,6 +1182,13 @@ class Nurse_Frame(Base_Frame):
         tree.heading("name", text="Name")
         tree.heading("ward", text="Ward")
         tree.grid(row=3, column=0, columnspan=6, rowspan=5, padx=10, pady=12)
+        message, Info = sql_request.find_nurse_ward(self.id)
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                Info_ = sql_request.get_personal_info(self.id,'nurse')[1][0]
+                tree.insert('', i,
+                            values=(Info_[2],Info[i][1]))
 
     def Assignment(self):
         for widget in self.frame2.winfo_children():
@@ -1234,12 +1241,53 @@ class Nurse_Frame(Base_Frame):
         tree.heading("contact number", text="Contact Number")
         tree.heading("ward", text="Ward")
         tree.grid(row=3, column=0, columnspan=7, rowspan=5, padx=10, pady=12)
+        message, Info = sql_request.universal_find_nurse('', '')
+        if message == 'Success':
+            tree.delete(*tree.get_children())
+            for i in range(len(Info)):
+                Info_ = sql_request.find_nurse_ward(Info[i][0])[1]
+                tree.insert('', i,
+                            values=(Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5], Info_[0][1]))
 
         def Search():
-            pass
+            search_key = ''
+            if ID.get() != '':
+                search_key = ID.get()
+            elif Name.get() != '':
+                search_key = Name.get()
+            elif Department.get() != '':
+                search_key = Department.get()
+            if Ward.get() != '':
+                message, Info = sql_request.find_ward_nurse(Ward.get())
+                if message == 'Success':
+                    tree.delete(*tree.get_children())
+                    for i in range(len(Info)):
+                        Info_ = sql_request.get_personal_info(Info[i][0],'nurse')[1][0]
+                        tree.insert('', i,
+                                    values=(
+                                        Info_[0], Info_[1], Info_[2], Info_[3], Info_[4], Info_[5], Info[i][1]))
+            else:
+                message, Info = sql_request.universal_find_nurse(search_key, '')
+                if message == 'Success':
+                    tree.delete(*tree.get_children())
+                    for i in range(len(Info)):
+                        Info_ = sql_request.find_nurse_ward(Info[i][0])[1]
+                        tree.insert('', i,
+                                    values=(Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5],
+                                            Info_[0][1]))
 
         def Modify():
-            pass
+            result = sql_request.assign_ward(int(ID_.get()), int(Ward_.get()))[0]
+            if result == 'Success':
+                messagebox.showinfo("Success", "Successfully modified")
+                message, Info = sql_request.universal_find_nurse('', '')
+                if message == 'Success':
+                    tree.delete(*tree.get_children())
+                    for i in range(len(Info)):
+                        tree.insert('', i,
+                                    values=(Info[i][0], Info[i][1], Info[i][2], Info[i][3], Info[i][4], Info[i][5]))
+            else:
+                messagebox.showerror("Error", result)
 
 
     def Personal_Information(self):

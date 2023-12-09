@@ -456,9 +456,17 @@ def prescription_update(patient_id: int, doctor_id: int, content: str):
     # 返回成功状态和处方ID
     return 'Success'
 
-# Find the nurse–ward
+# Find the ward based on nurse_id
 def find_nurse_ward(nurse_id: str):
-    sql = ("SELECT * FROM nurse_assignment WHERE patient_id = %s" % nurse_id)
+    sql = ("SELECT * FROM nurse_assignment WHERE nurse_id = %s" % nurse_id)
+    status, result = db._sql_request(sql)
+    if not status == 'Success':
+        return 'SQL Error', []
+    return 'Success', result
+
+# Find the nurse based on room_id
+def find_ward_nurse(room_id: str):
+    sql = ("SELECT * FROM nurse_assignment WHERE room_id = %s" % room_id)
     status, result = db._sql_request(sql)
     if not status == 'Success':
         return 'SQL Error', []
@@ -466,4 +474,7 @@ def find_nurse_ward(nurse_id: str):
 
 # Assign ward
 def assign_ward(nurse_id:int, room_id:int):
-    pass
+    sql = ("UPDATE nurse_assignment SET room_id = %d WHERE nurse_id = %d "
+           %(room_id, nurse_id))
+    return db._sql_request(sql)
+
