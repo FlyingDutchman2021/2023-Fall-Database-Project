@@ -193,7 +193,8 @@ def get_personal_info(_id: int, _identity: str):
 
 
 # Universal
-def update_password(_id: int, _identity: str, old_password: str, new_password: str):
+# 删除了旧密码确认
+def update_password(_id: int, _identity: str, new_password: str):
     # 确认旧密码的正确性
     identity = ''
     if _identity == 'nurse':
@@ -202,16 +203,18 @@ def update_password(_id: int, _identity: str, old_password: str, new_password: s
         identity = 'P'
     elif _identity == 'doctor':
         identity = 'D'
-    status1, result1 = db.find_password(_id, identity)
-    if not status1 == 'Success':
-        return 'SQL Error'
-    stored_password = result1[0][0]
-    if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
-        return 'Wrong Password'
+
+    # status1, result1 = db.find_password(_id, identity)
+    # if not status1 == 'Success':
+    #     return 'SQL Error'
+    # stored_password = result1[0][0]
+    # if not bc.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
+    #     return 'Wrong Password'
+
     # 哈希处理新密码
     hashed_password = db.hash_new_password(new_password)
     # 更新密码
-    status, result = db.update_password(_id, 'N', hashed_password)
+    status, result = db.update_password(_id, identity, hashed_password)
     if not status == 'Success':
         return 'SQL Error'
     return 'Success'

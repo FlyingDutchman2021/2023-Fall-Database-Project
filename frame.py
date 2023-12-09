@@ -548,7 +548,7 @@ class Patient_Frame(Base_Frame):
         self.Label1 = ctk.StringVar()
         self.Label2 = ctk.StringVar()
 
-        self.password.set("123456789")
+        self.password.set('123456789')
 
         self.year = []
         self.month = []
@@ -575,6 +575,7 @@ class Patient_Frame(Base_Frame):
         self.frame2 = ctk.CTkFrame(self.tk_frame, corner_radius=10)  # 添加圆角
         self.frame2.pack(side='left', padx=10, fill='both', expand=True)
 
+    # 仅作展示
     def Attendance_records(self):
         for widget in self.frame2.winfo_children():
             widget.destroy()
@@ -677,7 +678,7 @@ class Patient_Frame(Base_Frame):
 
                 ctk.CTkEntry(master=frame, textvariable=self.email, width=300).grid(
                     row=6, column=1, columnspan=3, padx=10, pady=12)
-
+    # 输入密码
                 ctk.CTkEntry(master=frame, textvariable=self.password, show='*', width=300).grid(
                     row=7, column=1, columnspan=3, padx=10, pady=12)
                 ctk.CTkEntry(master=frame, textvariable=self.password_, show='*', width=300).grid(
@@ -690,8 +691,8 @@ class Patient_Frame(Base_Frame):
                 self.password.trace_add("write", self.Password_confirmation)
                 self.password_.trace_add("write", self.Password_confirmation)
 
-                # 确认按钮，点击后提交注册
-                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.register).grid(row=10, column=1,
+                # 确认按钮，点击后提交修改结果
+                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.update).grid(row=10, column=1,
                                                                                                      padx=10,
                                                                                                      pady=12)
 
@@ -716,7 +717,59 @@ class Patient_Frame(Base_Frame):
         ctk.CTkLabel(master=frame, textvariable=self.Label1, width=5).pack()
         self.password_entry.trace_add("write", self.Modify)
 
+    def update(self):
+                # 输入是否有空
+                if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
+                            self.birthday_year.get(),  self.birthday_month.get(),
+                            self.birthday_day.get(), self.gender.get()]):
+                    messagebox.showerror("Error", "Please fill in all fields")
+                    return
 
+                # 验证联系电话格式
+                if not self.validate_contact_number(self.contact_number.get()):
+                    messagebox.showerror("Error", "Invalid contact number format")
+                    return
+
+                # 验证电子邮件格式
+                if not self.validate_email(self.email.get()):
+                    messagebox.showerror("Error", "Invalid email format")
+                    return
+
+                # 验证密码是否匹配
+                if self.password.get() != self.password_.get():
+                    messagebox.showerror("Error", "Passwords do not match")
+                    return
+
+                # 验证血型
+                if not self.validate_blood_type(self.blood_type.get()):
+                    messagebox.showerror("Error", "Invalid blood type. Please choose A, B, AB or O.")
+                    return
+
+                # 组合生日日期
+                birth_date = f"{self.birthday_year.get()}{self.birthday_month.get().zfill(2)}{self.birthday_day.get().zfill(2)}"
+
+                # 如果满足上述条件
+                # 调用后端函数进行注册
+                result = sql_request.update_patient_general(
+                    self.id, # 获取ID
+                    self.email.get(),
+                    self.name.get(),
+                    self.gender.get(),
+                    birth_date,
+                    self.blood_type.get(),
+                    self.contact_number.get(),
+                    self.note.get()
+                )
+                sql_request.update_password(
+                    self.id,
+                    'patient',
+                    self.password.get()
+                )
+                if result == 'Success':
+                    messagebox.showinfo("Success", "Successfully modified")
+                    self.switch_Patient(self.id)
+                else:
+                    messagebox.showerror("Error", result)
 
     def Password_confirmation(self, *args):  # 二次确认密码相同，检查密码相同
                 self.Label2.set('')
@@ -752,7 +805,7 @@ class Patient_Frame(Base_Frame):
     def register(self):
                 # 输入是否有空
                 if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
-                            self.birthday_year.get(), self.note.get(), self.birthday_month.get(),
+                            self.birthday_year.get(),  self.birthday_month.get(),
                             self.birthday_day.get(), self.gender.get()]):
                     messagebox.showerror("Error", "Please fill in all fields")
                     return
@@ -839,7 +892,7 @@ class Doctor_Frame(Base_Frame):
         self.Label2 = ctk.StringVar()
 
 
-        self.password.set('123456789')
+        self.password.set('123456789')  # 二次输入密码，正确即可进入修改界面
 
 
         ctk.CTkLabel(master=self.frame1, text="ID: " + str(self.id)).pack(padx=10, pady=12)
@@ -1010,13 +1063,57 @@ class Doctor_Frame(Base_Frame):
                 self.password.trace_add("write", self.Password_confirmation)
                 self.password_.trace_add("write", self.Password_confirmation)
 
-                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.register).grid(
+                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.update).grid(
                     row=7, column=1, padx=10, pady=12)
                 ctk.CTkButton(master=frame, text="Back", width=5,
                               command=lambda: self.switch_Doctor(self.id)).grid(
                     row=7, column=3, padx=10, pady=12)
             else:
                 self.Label1.set('The password is wrong')
+
+    def update(self):
+                # 输入是否有空
+                if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
+                         self.gender.get()]):
+                    messagebox.showerror("Error", "Please fill in all fields")
+                    return
+
+                # 验证联系电话格式
+                if not self.validate_contact_number(self.contact_number.get()):
+                    messagebox.showerror("Error", "Invalid contact number format")
+                    return
+
+                # 验证电子邮件格式
+                if not self.validate_email(self.email.get()):
+                    messagebox.showerror("Error", "Invalid email format")
+                    return
+
+                # 验证密码是否匹配
+                if self.password.get() != self.password_.get():
+                    messagebox.showerror("Error", "Passwords do not match")
+                    return
+
+
+                # 如果满足上述条件
+                # 调用后端函数进行注册
+                result = sql_request.update_doctor_general(
+                    self.id, # 获取ID
+                    self.email.get(),
+                    self.name.get(),
+                    self.gender.get(),
+                    self.contact_number.get(),
+                )
+                sql_request.update_password(
+                    self.id,
+                    'doctor',
+                    self.password.get()
+                )
+                if result == 'Success':
+                    messagebox.showinfo("Success", "Successfully modified")
+                    self.switch_Patient(self.id)
+                else:
+                    messagebox.showerror("Error", result)
+
 
     def Password_confirmation(self, *args):
         self.Label2.set('')
@@ -1268,13 +1365,55 @@ class Nurse_Frame(Base_Frame):
                 self.password.trace_add("write", self.Password_confirmation)
                 self.password_.trace_add("write", self.Password_confirmation)
 
-                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.register).grid(
+                ctk.CTkButton(master=frame, text="Finish", width=5, command=self.update).grid(
                     row=7, column=1, padx=10, pady=12)
                 ctk.CTkButton(master=frame, text="Back", width=5,
                               command=lambda: self.switch_Nurse(self.id)).grid(
                     row=7, column=3, padx=10, pady=12)
             else:
                 self.Label1.set('The password is wrong')
+    def update(self):
+                # 输入是否有空
+                if not all([self.name.get(), self.email.get(), self.contact_number.get(), self.password.get(),
+                         self.gender.get()]):
+                    messagebox.showerror("Error", "Please fill in all fields")
+                    return
+
+                # 验证联系电话格式
+                if not self.validate_contact_number(self.contact_number.get()):
+                    messagebox.showerror("Error", "Invalid contact number format")
+                    return
+
+                # 验证电子邮件格式
+                if not self.validate_email(self.email.get()):
+                    messagebox.showerror("Error", "Invalid email format")
+                    return
+
+                # 验证密码是否匹配
+                if self.password.get() != self.password_.get():
+                    messagebox.showerror("Error", "Passwords do not match")
+                    return
+
+
+                # 如果满足上述条件
+                # 调用后端函数进行注册
+                result = sql_request.update_nurse_general(
+                    self.id, # 获取ID
+                    self.email.get(),
+                    self.name.get(),
+                    self.gender.get(),
+                    self.contact_number.get(),
+                )
+                sql_request.update_password(
+                    self.id,
+                    'nurse',
+                    self.password.get()
+                )
+                if result == 'Success':
+                    messagebox.showinfo("Success", "Successfully modified")
+                    self.switch_Patient(self.id)
+                else:
+                    messagebox.showerror("Error", result)
 
     def Password_confirmation(self, *args):
         self.Label2.set('')
