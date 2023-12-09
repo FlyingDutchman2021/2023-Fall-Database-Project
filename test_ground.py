@@ -2,9 +2,6 @@ import tkinter as tk
 import frame
 import customtkinter as ctk
 
-
-
-
 class MainWindow:
     def setup_main_window(self):
         full_width = self.window.winfo_screenwidth()
@@ -20,7 +17,7 @@ class MainWindow:
         self.window = ctk.CTk()
         self.setup_main_window()
 
-        self.frame1 = frame.Identity_Frame (self.window)
+        self.frame1 = frame.Nurse_Frame (self.window,100000000001)
 
         # Main loop
         self.window.mainloop()

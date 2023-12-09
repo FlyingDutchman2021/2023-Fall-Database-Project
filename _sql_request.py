@@ -291,6 +291,7 @@ def update_doctor_info(_id: int, _email: str, _name: str, _sex: str, _contact_nu
 
 
 def update_doctor_admin(_id: int, department: str, status: str):
+
     sql = "UPDATE doctor_info SET department='%s', status='%s' WHERE id=%d" % (department, status, _id)
     return _sql_request(sql)
 

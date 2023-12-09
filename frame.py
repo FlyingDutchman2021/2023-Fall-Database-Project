@@ -520,6 +520,8 @@ class Patient_Frame(Base_Frame):
         self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
+
+        print(sql_request.get_personal_info(self.id, 'patient'))
         Info = sql_request.get_personal_info(self.id, 'patient')[1][0]
 
         self.name = ctk.StringVar()
@@ -871,6 +873,10 @@ class Doctor_Frame(Base_Frame):
         self.id = id
         self.frame1 = ctk.CTkFrame(self.tk_frame)
         self.frame2 = ctk.CTkFrame(self.tk_frame)
+
+        print(self.id)
+
+        print(sql_request.get_personal_info(self.id, 'doctor'))
         Info = sql_request.get_personal_info(self.id, 'doctor')[1][0]
 
         self.name = ctk.StringVar()
@@ -1140,7 +1146,6 @@ class Doctor_Frame(Base_Frame):
                     self.switch_Patient(self.id)
                 else:
                     messagebox.showerror("Error", result)
-
 
     def Password_confirmation(self, *args):
         self.Label2.set('')
@@ -1527,6 +1532,13 @@ class Administrator_Frame(Base_Frame):
         frame = ctk.CTkFrame(self.frame2)
         frame.pack(expand="yes")
 
+        self.Status_ = Status_
+        self.Status = Status
+        self.ID_ = ID_
+        self.ID = ID
+        self.Department_ = Department_
+        self.Department = Department
+
         ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text="Department").grid(row=0, column=2, padx=10, pady=12)
@@ -1593,7 +1605,18 @@ class Administrator_Frame(Base_Frame):
                     tree.insert('', i, values=(Info[i][0],Info[i][1],Info[i][2],Info[i][3],Info[i][4],Info[i][5],Info[i][6]))
 
         def Modify():
-            pass
+
+            # 调用后端函数进行搜索
+            result = sql_request.update_doctor_admin(
+                int(self.ID_.get()),  # 获取ID
+                self.Department_.get(),
+                self.Status_.get()
+            )
+
+            if result == 'Success':
+                messagebox.showinfo("Success", "Successfully modified")
+            else:
+                messagebox.showerror("Error", result)
 
 
     def Nurse(self):
@@ -1611,6 +1634,15 @@ class Administrator_Frame(Base_Frame):
         isMaster_ = ctk.IntVar()
         frame = ctk.CTkFrame(self.frame2)
         frame.pack(expand="yes")
+
+        self.Status_ = Status_
+        self.Status = Status
+        self.ID_ = ID_
+        self.ID = ID
+        self.Department_ = Department_
+        self.Department = Department
+        self.isMaster=isMaster
+        self.isMaster_=isMaster_
 
         ctk.CTkLabel(master=frame, text='ID').grid(row=0, column=0, padx=10, pady=12)
         ctk.CTkLabel(master=frame, text='Name').grid(row=0, column=1, padx=10, pady=12)
@@ -1690,7 +1722,19 @@ class Administrator_Frame(Base_Frame):
                                 Info[i][7]))
 
         def Modify():
-            pass
+
+            # 调用后端函数进行搜索
+            result = sql_request.update_nurse_admin(
+                int(self.ID_.get()),  # 获取ID
+                self.Department_.get(),
+                self.Status_.get(),
+                bool(self.isMaster.get())
+            )
+
+            if result == 'Success':
+                messagebox.showinfo("Success", "Successfully modified")
+            else:
+                messagebox.showerror("Error", result)
 
 
 # TODO   管理员界面，开药方的界面，开检查单的界面，分配病房的界面（护士长），病房查看的界面，药房的界面
